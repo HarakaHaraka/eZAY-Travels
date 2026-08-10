@@ -2,8 +2,17 @@
 // Build to this. If a change is needed, change this file and say why.
 // ALL MONEY IS INTEGER MINOR UNITS (pence). Never Float, never Decimal-as-pounds.
 
-generator client { provider = "prisma-client-js" }
-datasource db    { provider = "postgresql"; url = env("DATABASE_URL") }
+// CHANGED (formatting only, no model change): these two blocks were written
+// inline with a semicolon separator, which Prisma's parser rejects — it needs
+// one assignment per line. Expanded verbatim; every model below is untouched.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
 // ───────────────────────── people ─────────────────────────
 model Customer {
@@ -323,6 +332,31 @@ model DestinationGuide {
   published     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+
+  // ADDED: the homepage hero scenes, destination bands and offer cards were
+  // hardcoded arrays in design/index.html. The build brief requires them to
+  // live here so they are editable rather than in code. Split into named
+  // fields rather than one JSON blob wherever the shape is fixed, so admin
+  // can edit them as a form; the two genuinely list-shaped things
+  // (featuredOffers, gettingAround) stay JSON.
+  sortOrder      Int      @default(0)
+  onHomepage     Boolean  @default(false)
+
+  // hero scene
+  chipLabel      String?                             // "Lagos lights"
+  heroKicker     String?                             // "Lagos · Detty December"
+  heroHeadline   String?
+  heroSub        String?
+
+  // destination band
+  bandTag        String?                             // "Detty December · book by September"
+  bandTagTone    String?                             // tag-accent | tag-accent-2 | tag-neutral
+  bandBody       String?
+  bandNote       String?
+  featuredOffers Json?                               // offer cards shown under the band
+  gettingAround  Json?                               // transfer / getting-around rows
+
+  @@index([onHomepage, sortOrder])
 }
 
 model Setting {

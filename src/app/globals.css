@@ -1,0 +1,11 @@
+/*
+ * Tailwind is used for the ADMIN surfaces only. The public site is styled by
+ * organic.css (the approved component sheet) and home.css (the approved page
+ * layout), both ported verbatim from design/. Do not convert those to
+ * Tailwind utilities — the design is signed off as written.
+ *
+ * Tailwind's preflight is deliberately disabled in tailwind.config.ts so it
+ * cannot reset the design sheet out from under the public pages.
+ */
+@tailwind components;
+@tailwind utilities;
