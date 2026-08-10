@@ -4,7 +4,6 @@ import path from 'path';
 import type { Prisma } from '@prisma/client';
 import { protectionSnapshot } from './accreditation';
 import { renderConfirmationPdf } from './confirmationPdf';
-import { config } from './config';
 import { prisma } from './db';
 import { sendEmail } from './email';
 import { formatMoney } from './money';

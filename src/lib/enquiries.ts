@@ -44,8 +44,12 @@ export const enquirySchema = z.object({
   paxChildren: z.number().int().min(0).max(20).default(0),
   paxInfants: z.number().int().min(0).max(20).default(0),
   source: z.string().trim().max(40).default('website'),
-  /** Honeypot — must be empty. Bots fill it, people never see it. */
-  website: z.string().max(0).optional().or(z.literal('')),
+  /**
+   * Honeypot. Accepted by the schema on purpose — the ROUTE decides what to
+   * do with it, so a bot gets a 201 and learns nothing. Validating it here
+   * instead would reject with a 400 and tell the bot it had been spotted.
+   */
+  website: z.string().max(200).optional(),
 });
 
 export type EnquiryInput = z.infer<typeof enquirySchema>;
