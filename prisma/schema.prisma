@@ -1,0 +1,332 @@
+// eZAY Travels — data model.
+// Build to this. If a change is needed, change this file and say why.
+// ALL MONEY IS INTEGER MINOR UNITS (pence). Never Float, never Decimal-as-pounds.
+
+generator client { provider = "prisma-client-js" }
+datasource db    { provider = "postgresql"; url = env("DATABASE_URL") }
+
+// ───────────────────────── people ─────────────────────────
+model Customer {
+  id          String    @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  whatsapp    String?
+  language    String    @default("en")     // en | so | ar | ur | fr
+  notes       String?
+  enquiries   Enquiry[]
+  orders      Order[]
+  createdAt   DateTime  @default(now())
+  @@index([email])
+  @@index([phone])
+}
+
+// ───────────── enquiries: the primary revenue channel ─────────────
+// Travel enquiries convert on the 3rd–4th contact. This pipeline IS the business.
+model Enquiry {
+  id           String        @id @default(cuid())
+  reference    String        @unique              // ENQ-XXXXXX
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  customerId   String?
+  name         String
+  email        String
+  phone        String?
+  whatsappOptIn Boolean      @default(true)
+  tripType     String                              // flight | flight_hotel | group | transfer | other
+  origin       String?
+  destination  String?
+  travelDate   DateTime?
+  returnDate   DateTime?
+  paxAdults    Int           @default(1)
+  paxChildren  Int           @default(0)
+  paxInfants   Int           @default(0)
+  budgetBand   String?                             // under_500 | 500_800 | 800_plus
+  message      String?
+  source       String        @default("website")   // website | whatsapp | phone | instagram | tiktok | referral | partner
+  partner      Partner?      @relation(fields: [partnerId], references: [id])
+  partnerId    String?
+
+  stage        String        @default("enquiry")   // enquiry | quoted | follow_up_1 | follow_up_2 | booked | travelled | review_requested | lost
+  lostReason   String?
+  quotedMinor  Int?
+  owner        String?
+
+  // SLA: quote due +4 working hours, follow-ups due day 2 and day 5
+  quoteDueAt     DateTime?
+  followUp1DueAt DateTime?
+  followUp2DueAt DateTime?
+
+  events       EnquiryEvent[]
+  orders       Order[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  @@index([stage])
+  @@index([createdAt])
+}
+
+model EnquiryEvent {
+  id         String   @id @default(cuid())
+  enquiry    Enquiry  @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  enquiryId  String
+  fromStage  String?
+  toStage    String?
+  note       String?
+  actor      String?
+  createdAt  DateTime @default(now())
+}
+
+// ───────────────────────── orders ─────────────────────────
+model Order {
+  id            String   @id @default(cuid())
+  reference     String   @unique                  // EZY-XXXXXX — what the customer quotes on the phone
+  enquiry       Enquiry? @relation(fields: [enquiryId], references: [id])
+  enquiryId     String?
+  customer      Customer @relation(fields: [customerId], references: [id])
+  customerId    String
+
+  // API order from Duffel, or MANUAL order logged after booking on a trade portal.
+  // Treated identically downstream. Manual orders are the highest-margin ones.
+  orderType     String   @default("api")          // api | manual
+  supplier      String   @default("duffel")       // duffel | faremine | pta | direct
+  supplierRef   String?                           // PNR / their booking reference
+
+  status        String   @default("pending")      // pending | confirmed | ticketed | travelled | cancelled | refunded | requires_attention
+  currency      String   @default("GBP")
+  costMinor     Int      @default(0)              // what WE pay suppliers
+  markupMinor   Int      @default(0)              // our margin
+  totalMinor    Int      @default(0)              // what the customer pays
+  paidMinor     Int      @default(0)
+  balanceDueAt  DateTime?
+
+  // Read from ATOL_* config AT THE TIME OF SALE and frozen here, so a later
+  // config change never rewrites what a past customer was told.
+  protectionHolder    String?
+  protectionNumber    String?
+  protectionStatement String?
+
+  items         OrderItem[]
+  passengers    Passenger[]
+  payments      Payment[]
+  hotels        OrderHotel[]
+  transfers     Transfer[]
+  documents     ConfirmationDocument[]
+  remittance    Remittance?
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@index([status])
+  @@index([orderType])
+}
+
+// Every priced line: flight, hotel, transfer, ancillary, insurance, fee
+model OrderItem {
+  id           String   @id @default(cuid())
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId      String
+  itemType     String                              // flight | hotel | transfer | ancillary | insurance | fee
+  description  String
+  supplier     String?
+  supplierRef  String?
+  qty          Int      @default(1)
+  costMinor    Int      @default(0)
+  markupMinor  Int      @default(0)
+  priceMinor   Int      @default(0)
+  startsAt     DateTime?
+  endsAt       DateTime?
+  status       String   @default("held")           // held | confirmed | cancelled
+  meta         Json?
+  segments     FlightSegment[]
+  createdAt    DateTime @default(now())
+  @@index([orderId])
+  @@index([itemType])
+}
+
+model FlightSegment {
+  id                String   @id @default(cuid())
+  item              OrderItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId            String
+  leg               Int      @default(1)
+  marketingCarrier  String?
+  flightNumber      String?
+  originIata        String
+  destinationIata   String
+  departsAt         DateTime
+  arrivesAt         DateTime
+  cabinClass        String?
+  baggageIncluded   String?
+  duffelOfferId     String?
+  duffelOrderId     String?
+  pnr               String?
+}
+
+model Passenger {
+  id             String   @id @default(cuid())
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId        String
+  title          String?
+  givenName      String
+  familyName     String
+  dateOfBirth    DateTime?
+  passportNo     String?
+  passportExpiry DateTime?
+  nationality    String?
+  paxType        String   @default("adult")        // adult | child | infant
+}
+
+// ─────────────────── hotel registry & transfers ───────────────────
+model Hotel {
+  id           String       @id @default(cuid())
+  name         String
+  city         String
+  country      String
+  address      String?
+  starRating   Int?
+  distanceNote String?                             // "10 min walk to the Colosseum"
+  supplier     String?                             // duffel_stays | bedbank | direct | affiliate
+  bookingUrl   String?                             // affiliate / direct booking link
+  imageUrls    String[]                            // licensed via the supplier's API terms
+  contactName  String?
+  contactPhone String?
+  contactEmail String?
+  notes        String?
+  active       Boolean      @default(true)
+  rates        HotelRate[]
+  orderHotels  OrderHotel[]
+  createdAt    DateTime     @default(now())
+  @@index([city])
+}
+
+model HotelRate {
+  id           String    @id @default(cuid())
+  hotel        Hotel     @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  hotelId      String
+  roomType     String                              // quad | triple | double | single
+  board        String?                             // room_only | breakfast | half_board
+  seasonFrom   DateTime?
+  seasonTo     DateTime?
+  costMinor    Int                                 // per room per night, our cost
+  sellMinor    Int                                 // per room per night, sell price
+  currency     String    @default("GBP")
+  source       String?                             // "live quote 2026-08-12, revenue mgr"
+  // NULL = PLACEHOLDER. The public site must never render a rate with a null verifiedAt.
+  verifiedAt   DateTime?
+  orderHotels  OrderHotel[]
+  createdAt    DateTime  @default(now())
+  @@index([hotelId])
+}
+
+model OrderHotel {
+  id             String     @id @default(cuid())
+  order          Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId        String
+  hotel          Hotel      @relation(fields: [hotelId], references: [id])
+  hotelId        String
+  rate           HotelRate? @relation(fields: [rateId], references: [id])
+  rateId         String?
+  checkIn        DateTime
+  checkOut       DateTime
+  rooms          Int        @default(1)
+  roomType       String?
+  board          String?
+  confirmationNo String?
+  status         String     @default("requested")  // requested | confirmed | cancelled
+}
+
+model Transfer {
+  id          String   @id @default(cuid())
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId     String
+  direction   String                                // arrival | departure | intercity
+  pickup      String
+  dropoff     String
+  pickupAt    DateTime
+  vehicle     String?                               // saloon | mpv | minibus | coach
+  pax         Int      @default(1)
+  supplier    String?
+  driverName  String?
+  driverPhone String?
+  costMinor   Int      @default(0)
+  sellMinor   Int      @default(0)
+  status      String   @default("requested")
+}
+
+// ───────────────────────── money ─────────────────────────
+model Payment {
+  id                  String   @id @default(cuid())
+  order               Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId             String
+  kind                String   @default("deposit")  // deposit | balance | full | refund
+  amountMinor         Int
+  currency            String   @default("GBP")
+  method              String   @default("stripe")   // stripe | bank_transfer | cash
+  stripeSessionId     String?
+  stripePaymentIntent String?  @unique
+  status              String   @default("pending")  // pending | paid | failed | refunded
+  paidAt              DateTime?
+  createdAt           DateTime @default(now())
+  @@index([orderId])
+}
+
+// Only used when PAYMENT_MODE=collect_and_remit
+model Remittance {
+  id            String   @id @default(cuid())
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId       String   @unique
+  amountMinor   Int
+  dueAt         DateTime
+  remitted      Boolean  @default(false)
+  remittedAt    DateTime?
+  reference     String?
+}
+
+model ConfirmationDocument {
+  id             String   @id @default(cuid())
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId        String
+  issuedAt       DateTime @default(now())
+  deliveryStatus String   @default("pending")       // pending | sent | failed
+  documentUrl    String?
+  // Idempotency: a replayed webhook must not produce a second document.
+  idempotencyKey String   @unique
+}
+
+// ─────────────────── partners & content ───────────────────
+model Partner {
+  id           String    @id @default(cuid())
+  name         String
+  type         String                                // creator | event | corporate | community | supplier
+  contactName  String?
+  contactEmail String?
+  contactPhone String?
+  trackingCode String?   @unique                     // ?ref=CODE
+  rewardType   String?                                // per_booking | per_pax | rev_share
+  rewardMinor  Int       @default(0)
+  rewardPct    Float     @default(0)
+  status       String    @default("prospect")
+  enquiries    Enquiry[]
+  createdAt    DateTime  @default(now())
+}
+
+model DestinationGuide {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  city          String
+  country       String
+  heroImage     String
+  imageCredit   String?                              // e.g. "Grace Nandi · Unsplash"
+  imageLicence  String?                              // e.g. "Unsplash Licence" | "Owned"
+  bookingWindow String?
+  visaNotes     String?
+  budgetBands   Json?
+  bodyMdx       String
+  published     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}

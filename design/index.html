@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>eZAY Travels — checked across three sources, fee on the line</title>
+<meta name="description" content="UK travel agency for festival and long-haul independent travellers. Every fare checked across three sources, our fee printed on the line. Quote back within four working hours.">
+<link rel="stylesheet" href="styles.css">
+<style>
+/* ── page-level layout. Component classes and tokens live in styles.css ── */
+html { scroll-behavior: smooth; }
+body { overflow-x: clip; }                 /* clip, NOT hidden — hidden kills sticky */
+.wrap { max-width: 1680px; margin: 0 auto; }
+
+/* header */
+.hdr {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 12px 24px;
+  padding: 12px clamp(16px, 2.4vw, 40px);
+  background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+}
+.lock { display: flex; align-items: center; gap: 10px; margin-right: auto; text-decoration: none; color: inherit; }
+.lock .mark { width: 34px; height: 34px; border-radius: 50%; background: var(--color-night); display: grid; place-items: center; flex: none; }
+.lock .word { font-family: var(--font-heading); font-size: 22px; letter-spacing: -0.02em; }
+.hdr nav { display: flex; gap: 22px; }
+.hdr nav a { font-size: 14px; font-weight: 600; color: var(--color-text); text-decoration: none; }
+.hdr nav a:hover { color: var(--color-accent-700); }
+@media (max-width: 700px) { .hdr nav { display: none; } }
+
+/* hero */
+.hero { position: relative; min-height: 76vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 40px clamp(16px, 2.4vw, 40px) 92px; overflow: hidden; background: var(--color-night); }
+.hero .layer { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+.hero .layer.on { opacity: 1; }
+.hero .layer img, .hero .layer svg { width: 100%; height: 100%; object-fit: cover; animation: ezKen 20s ease-in-out infinite alternate; }
+@keyframes ezKen { from { transform: scale(1.06); } to { transform: scale(1.18) translate3d(-1.5%, -1.5%, 0); } }
+.hero .scrim { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-night) 74%, transparent) 0%, color-mix(in srgb, var(--color-night) 26%, transparent) 38%, color-mix(in srgb, var(--color-night) 84%, transparent) 100%); }
+.hero .inner { position: relative; z-index: 2; color: var(--color-bg); }
+.hero .kick { background: color-mix(in srgb, var(--color-bg) 16%, transparent); color: var(--color-bg); backdrop-filter: blur(4px); }
+.hero h1 { font-size: clamp(40px, 6vw, 86px); line-height: 0.96; max-width: 15ch; margin: 14px 0 10px; text-shadow: 0 2px 24px rgba(6,22,28,.45); }
+.hero .sub { font-size: 18px; max-width: 46ch; color: var(--color-neutral-200); margin: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+.chip { padding: 9px 16px; border-radius: 999px; border: 0; cursor: pointer; font: 700 13px var(--font-body); backdrop-filter: blur(6px);
+  background: color-mix(in srgb, var(--color-bg) 16%, transparent); color: var(--color-bg); }
+.chip[aria-pressed="true"] { background: color-mix(in srgb, var(--color-accent) 90%, transparent); color: var(--color-night); }
+.credit { position: absolute; left: clamp(16px, 2.4vw, 40px); bottom: 12px; font-size: 10px; color: color-mix(in srgb, var(--color-bg) 60%, transparent); z-index: 2; }
+
+/* fare bar */
+.barwrap { position: sticky; top: 62px; z-index: 40; padding: 0 20px; margin-top: -46px; }
+.barwrap::before { content: ""; position: absolute; inset: -18px 0 -22px; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--color-bg) 92%, transparent) 42%, var(--color-bg) 100%);
+  opacity: 0; transition: opacity .25s ease; }
+.barwrap.stuck::before { opacity: 1; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; max-width: 1360px; margin: 0 auto;
+  padding: 13px 15px; border-radius: 999px;
+  background: linear-gradient(96deg, var(--color-accent-800) 0%, var(--color-accent-700) 46%, var(--color-accent-600) 100%);
+  border: 2.5px solid color-mix(in srgb, var(--color-bg) 72%, transparent);
+  animation: ezGlow 3.6s ease-in-out infinite; }
+@keyframes ezGlow {
+  0%,100% { box-shadow: 0 26px 60px rgba(6,22,28,.5), 0 0 0 0 color-mix(in srgb, var(--color-accent) 55%, transparent); }
+  50%     { box-shadow: 0 26px 60px rgba(6,22,28,.5), 0 0 0 14px color-mix(in srgb, var(--color-accent) 0%, transparent); }
+}
+.trip { display: inline-flex; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--color-night) 30%, transparent); }
+.trip button { border: 0; cursor: pointer; padding: 7px 14px; border-radius: 999px; font: 700 12px var(--font-body); background: transparent; color: var(--color-neutral-400); }
+.trip button[aria-pressed="true"] { background: var(--color-accent); color: var(--color-bg); }
+.well { padding: 5px 14px; border-radius: 22px; background: rgba(8,22,26,.34); border: 1px solid rgba(255,255,255,.14); min-width: 0; }
+.well.f1 { flex: 1 1 130px; } .well.f2 { flex: 1 1 150px; }
+.well label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: #FFD9BE; }
+.well input { width: 100%; border: 0; background: transparent; font: 600 14px var(--font-body); color: var(--color-bg); padding: 0; }
+.well input:focus { outline: none; }
+.stepper { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 22px; background: rgba(8,22,26,.34); border: 1px solid rgba(255,255,255,.14); }
+.stepper button { width: 26px; height: 26px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--color-bg) 45%, transparent); background: transparent; color: var(--color-bg); cursor: pointer; font-size: 15px; line-height: 1; }
+.stepper .n { font-family: var(--font-heading); font-size: 15px; min-width: 42px; text-align: center; color: var(--color-bg); }
+.total { text-align: right; min-width: 96px; margin-left: auto; }
+.total span { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: #FFD9BE; }
+.total strong { font-family: var(--font-heading); font-weight: 400; font-size: 22px; color: var(--color-bg); }
+.bar .go { padding: 13px 28px; font-size: 15px; background: var(--color-bg); color: var(--color-night); border: 0;
+  box-shadow: 0 6px 18px rgba(6,22,28,.3); }
+.bar .go:hover { background: #fff; }
+
+/* proof */
+.proof { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 22px; padding: 56px clamp(16px, 2.4vw, 40px) 20px; }
+.proof h3 { font-size: 30px; color: var(--color-accent-700); margin-bottom: 6px; }
+.proof p { font-size: 14px; line-height: 1.45; color: var(--color-neutral-800); margin: 0; }
+
+/* destination bands */
+.bands { display: flex; flex-direction: column; gap: 72px; padding: 44px clamp(16px, 2.4vw, 40px) 80px; }
+.band .row { display: flex; flex-wrap: wrap; gap: 18px; align-items: stretch; }
+.panel { position: relative; flex: 1 1 460px; min-width: 0; min-height: clamp(300px, 34vw, 470px); border-radius: 34px; overflow: hidden; box-shadow: var(--shadow-lg); background: var(--color-night); }
+.panel img, .panel svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.panel .ov { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--color-night) 80%, transparent) 0%, color-mix(in srgb, var(--color-night) 14%, transparent) 62%); }
+.panel .txt { position: absolute; top: 0; left: 0; padding: clamp(22px, 2.4vw, 34px); max-width: 26ch; pointer-events: none; }
+.panel .txt h2 { font-size: clamp(34px, 4vw, 54px); color: var(--color-bg); margin: 12px 0 8px; }
+.panel .txt p { font-size: 15px; color: var(--color-neutral-200); margin: 0; }
+.offers { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 14px; margin-top: 18px; }
+.offer { background: var(--color-surface); border: 1px solid var(--color-divider); border-radius: 26px; padding: 18px; display: flex; flex-direction: column; gap: 10px; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.offer:hover { border-color: var(--color-accent); }
+.offer[aria-pressed="true"] { border-color: var(--color-accent); box-shadow: var(--shadow-md); }
+.offer .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.offer .route { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--color-accent-700); }
+.offer .tot { font-family: var(--font-heading); font-size: 30px; line-height: 1; }
+.offer .det { font-size: 13px; color: var(--color-neutral-800); }
+.offer .brk { font-size: 12px; color: var(--color-neutral-700); }
+aside.side { flex: 1 1 420px; max-width: 560px; min-width: 0; display: flex; flex-direction: column; gap: 22px; padding: clamp(22px, 2vw, 32px); border-radius: 34px; background: var(--color-surface); }
+.side h6 { font-size: 11px; letter-spacing: .1em; color: var(--color-accent-700); margin: 0 0 14px; }
+.side .rows { display: flex; flex-direction: column; gap: 14px; }
+.side .r { display: flex; align-items: center; gap: 14px; }
+.side .r .thumb { width: 76px; height: 76px; flex: none; border-radius: 18px; object-fit: cover;
+  background: var(--color-neutral-300); box-shadow: var(--shadow-sm); }
+.side .r.wide { align-items: flex-start; flex-wrap: wrap; }
+.side .r.wide .pics { display: flex; gap: 8px; flex: none; }
+.side .r.wide .pics .thumb { width: 104px; height: 88px; border-radius: 16px; }
+.side .r.wide .meta { flex: 1 1 160px; padding-top: 4px; }
+.side .r.wide .pr { align-self: flex-start; padding-top: 4px; }
+.side .r .nm.lnk { color: var(--color-accent-700); text-decoration: none; }
+.side .r .nm.lnk:hover { text-decoration: underline; }
+.side .r .meta { flex: 1 1 auto; min-width: 0; }
+.side .r .pr { margin-left: auto; }
+.side .r .nm { font-size: 15px; font-weight: 600; display: block; }
+.side .r .sb { font-size: 12px; color: var(--color-neutral-700); display: block; margin-top: 2px; }
+.side .r .pr { font-family: var(--font-heading); font-size: 19px; white-space: nowrap; }
+.side .div { height: 1px; background: var(--color-divider); }
+.side .note { font-size: 12px; line-height: 1.5; color: var(--color-neutral-700); margin: auto 0 0; }
+
+/* credentials */
+.creds { background: var(--color-surface); border-radius: 34px; padding: clamp(24px, 3vw, 40px); margin: 0 clamp(16px, 2.4vw, 40px); }
+.creds-head { max-width: 58ch; margin-bottom: 22px; }
+.creds-head h3 { font-size: 30px; margin-bottom: 8px; }
+.creds-head p { margin: 0; font-size: 14.5px; color: var(--color-neutral-800); }
+.creds-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.cred { background: var(--color-neutral-100); border-radius: 22px; padding: 16px 18px; display: flex; gap: 12px; align-items: flex-start; }
+.cred .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin-top: 6px; }
+.cred.done .dot { background: var(--color-accent-2-500); }
+.cred.wip  .dot { background: var(--color-accent); }
+.cred .t { font-size: 14px; font-weight: 600; display: block; }
+.cred .v { font-size: 12.5px; color: var(--color-neutral-700); display: block; margin-top: 2px; }
+.creds-foot { margin: 18px 0 0; font-size: 13px; color: var(--color-neutral-700); max-width: 78ch; }
+
+/* sourcing */
+.sourcing { padding: clamp(24px, 3vw, 40px); border-radius: 34px; background: var(--color-surface); margin: 0 clamp(16px, 2.4vw, 40px); }
+.sourcing h2 { font-size: 34px; }
+.sourcing .intro { max-width: 60ch; color: var(--color-neutral-800); }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 16px; margin-top: 22px; }
+.step { padding: 20px; border-radius: 26px; background: var(--color-neutral-100); }
+.step .n { width: 34px; height: 34px; border-radius: 50%; background: var(--color-accent-100); color: var(--color-accent-700); font-family: var(--font-heading); display: grid; place-items: center; margin-bottom: 12px; }
+.step h4 { font-size: 19px; margin-bottom: 6px; }
+.step p { font-size: 13px; color: var(--color-neutral-800); margin: 0; }
+
+/* enquiry */
+.enq { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 32px; align-items: start; padding: clamp(24px, 3vw, 40px); border-radius: 34px; background: var(--color-night); color: var(--color-bg); margin: 56px clamp(16px, 2.4vw, 40px) 0; }
+.enq h2 { font-size: 34px; }
+.enq .lead { color: var(--color-neutral-400); max-width: 44ch; }
+.enq .wa { background: var(--color-accent-2-300); color: var(--color-accent-2-900); padding: 12px 20px; }
+.enq form { display: grid; gap: 12px; }
+.enq .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+.enq label.lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--color-neutral-400); margin-bottom: 5px; }
+.enq .input { background: color-mix(in srgb, var(--color-bg) 8%, transparent); border-color: color-mix(in srgb, var(--color-bg) 22%, transparent); color: var(--color-bg); }
+.enq textarea.input { border-radius: 22px; min-height: 120px; }
+.enq .budget { display: flex; flex-wrap: wrap; gap: 8px; }
+.enq .budget button { border: 1px solid color-mix(in srgb, var(--color-bg) 22%, transparent); background: transparent; color: var(--color-bg); padding: 8px 14px; border-radius: 999px; font: 600 13px var(--font-body); cursor: pointer; }
+.enq .budget button[aria-pressed="true"] { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-bg); }
+.enq .chk { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--color-neutral-300); }
+.enq .chk input { accent-color: var(--color-accent); width: 17px; height: 17px; }
+
+footer { padding: 28px; text-align: center; font-size: 12px; color: var(--color-neutral-700); }
+
+/* WhatsApp bubble */
+.wabub { position: fixed; right: 18px; bottom: 18px; z-index: 90; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+.wapanel { width: min(320px, calc(100vw - 36px)); border-radius: 26px; overflow: hidden; background: var(--color-neutral-100); box-shadow: var(--shadow-lg); }
+.wapanel[hidden] { display: none; }
+.wapanel .h { background: var(--color-night); color: var(--color-bg); padding: 15px 18px; }
+.wapanel .h strong { display: block; font-family: var(--font-heading); font-weight: 400; font-size: 17px; }
+.wapanel .h span { font-size: 12.5px; color: var(--color-neutral-400); }
+.wapanel .b { padding: 14px; }
+.wapanel .b > p { font-size: 13px; color: var(--color-neutral-700); margin: 0 0 11px; }
+.qr { display: block; width: 100%; text-align: left; font: 600 14px var(--font-body); color: var(--color-accent-800); background: var(--color-accent-100); border: 1px solid var(--color-accent-200); border-radius: 14px; padding: 11px 13px; margin-bottom: 8px; cursor: pointer; }
+.qr:hover { background: var(--color-accent-200); }
+.waalt { display: flex; gap: 8px; }
+.waalt a { flex: 1; text-align: center; font-size: 12.5px; font-weight: 600; text-decoration: none; color: var(--color-neutral-700); border: 1px solid var(--color-divider); border-radius: 12px; padding: 9px 6px; }
+.fab { position: relative; display: flex; align-items: center; gap: 10px; background: #25D366; color: #fff; border: 0; cursor: pointer; font: 700 14.5px var(--font-body); padding: 14px 20px 14px 16px; border-radius: 999px; box-shadow: 0 10px 28px -8px rgba(37,211,102,.75); }
+.fab .pl { position: absolute; inset: 0; border-radius: 999px; animation: ezPulse 2.6s infinite; }
+@keyframes ezPulse { 0% { box-shadow: 0 0 0 0 rgba(37,211,102,.5); } 70% { box-shadow: 0 0 0 16px rgba(37,211,102,0); } 100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); } }
+@media (max-width: 520px) { .fab .t { display: none; } .fab { padding: 15px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <a class="lock" href="#top">
+    <span class="mark">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f1f6fa" stroke-width="2.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3 15c5.5 0 9-3 12-9"/><path d="M14.5 6H21v6.5"/>
+      </svg>
+    </span>
+    <span class="word">eZAY</span>
+  </a>
+  <nav>
+    <a href="#destinations">Destinations</a>
+    <a href="#sourcing">How we price</a>
+    <a href="#credentials">Where we are</a>
+    <a href="#enquiry">Enquire</a>
+  </nav>
+  <button class="btn btn-secondary" id="hdrWa" type="button">WhatsApp us</button>
+</header>
+
+<section class="hero" id="top">
+  <div id="layers" aria-hidden="true"></div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="inner wrap" style="width:100%">
+    <span class="tag kick" id="kick"></span>
+    <h1 id="hh"></h1>
+    <p class="sub" id="hs"></p>
+    <div class="chips" id="chips" role="group" aria-label="Featured destinations"></div>
+  </div>
+  <span class="credit" id="credit"></span>
+</section>
+
+<div class="barwrap">
+  <form class="bar" id="fare">
+    <div class="trip" role="group" aria-label="Trip type">
+      <button type="button" data-trip="return" aria-pressed="true">Return</button>
+      <button type="button" data-trip="oneway" aria-pressed="false">One way</button>
+    </div>
+    <div class="well f1"><label for="from">From</label><input id="from" value="London LON"></div>
+    <div class="well f1"><label for="to">To</label><input id="to" readonly></div>
+    <div class="well f2"><label for="dates">Dates</label><input id="dates" readonly></div>
+    <div class="stepper">
+      <button type="button" id="minus" aria-label="Fewer travellers">−</button>
+      <span class="n" id="pax">2 adults</span>
+      <button type="button" id="plus" aria-label="More travellers">+</button>
+    </div>
+    <div class="total"><span>Best of 3 sources</span><strong id="tot">£1,378</strong></div>
+    <button class="btn go" id="go" type="submit">Search fares</button>
+  </form>
+</div>
+
+<section class="proof wrap">
+  <div><h3>3 sources</h3><p>Every enquiry is checked across all three before we quote. You see which one we used.</p></div>
+  <div><h3>4 hours</h3><p>A written quote back inside four working hours. Not "we'll get to it".</p></div>
+  <div><h3>One number</h3><p>Flight, hotel and cover priced together, with our fee on the line where you can see it.</p></div>
+</section>
+
+<div class="bands wrap" id="destinations"></div>
+
+<section class="wrap" style="padding-top:0" id="credentials">
+  <div class="creds">
+    <div class="creds-head">
+      <h3>Where we are, honestly</h3>
+      <p>We are a new agency and we are not going to pretend otherwise. Here is exactly what is in place and what is not — updated as each one lands.</p>
+    </div>
+    <div class="creds-grid" id="credsGrid"></div>
+    <p class="creds-foot">Until financial protection is confirmed, we quote and advise but we do not take payment for flights on this site. Every enquiry is answered by a person within four working hours.</p>
+  </div>
+</section>
+
+<section class="sourcing wrap" id="sourcing">
+  <h2>How we source your fare</h2>
+  <p class="intro">Three places a fare can come from, and we check all of them before we send you a number. Then we tell you which one we used and what we made on it — because you'll find out eventually, and it's better coming from us.</p>
+  <div class="steps">
+    <div class="step"><div class="n">1</div><h4>The live search</h4><p>Real-time airline pricing, the same feed the big sites use. Fast, and honest on short-haul.</p></div>
+    <div class="step"><div class="n">2</div><h4>Trade net fares</h4><p>Consolidator pricing you can't see publicly. On long-haul this is usually where your saving comes from.</p></div>
+    <div class="step"><div class="n">3</div><h4>Our ticketing partner</h4><p>Ticketed and issued through an accredited partner. We tell you which fare we used and what we made on it.</p></div>
+  </div>
+</section>
+
+<section class="enq wrap" id="enquiry">
+  <div>
+    <h2>Tell us where and when. We'll come back with a real number.</h2>
+    <p class="lead">Groups, complex routings, anything with a visa question — that's the stuff we're actually good at. Quote back within four working hours, and we'll say plainly if you're better off booking it yourself.</p>
+    <button class="btn wa" id="enqWa" type="button">WhatsApp 0000 000 0000</button>
+    <p style="font-size:13px;color:var(--color-neutral-400);margin-top:12px">Usually replies within the hour</p>
+  </div>
+  <form id="enqForm">
+    <div class="two">
+      <div><label class="lbl" for="en">Name</label><input class="input" id="en" name="name" required></div>
+      <div><label class="lbl" for="ep">Mobile</label><input class="input" id="ep" name="phone" required></div>
+    </div>
+    <div><label class="lbl" for="et">Your trip</label><textarea class="input" id="et" name="trip" placeholder="Two of us, Lagos, out 18 Dec back 3 Jan, flexible by a day either side"></textarea></div>
+    <div>
+      <label class="lbl">Budget</label>
+      <div class="budget" id="budget" role="group">
+        <button type="button" data-b="Under £500" aria-pressed="false">Under £500</button>
+        <button type="button" data-b="£500–£800" aria-pressed="false">£500–£800</button>
+        <button type="button" data-b="£800+" aria-pressed="false">£800+</button>
+      </div>
+    </div>
+    <label class="chk"><input type="checkbox" id="ew" checked> Reply on WhatsApp — it's faster</label>
+    <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+    <button class="btn btn-primary btn-block" id="send" type="submit">Send it over</button>
+  </form>
+</section>
+
+<footer>eZAY Travels and Tours Ltd · London · Fares are examples. Ask us and we'll price your dates properly.</footer>
+
+<div class="wabub">
+  <div class="wapanel" id="waPanel" hidden>
+    <div class="h"><strong>Chat to us</strong><span>Usually replies within the hour</span></div>
+    <div class="b">
+      <p>What's it about? Pick one and WhatsApp opens with your message ready.</p>
+      <div id="waQr"></div>
+      <div class="waalt"><a href="#" id="waCall">Call instead</a><a href="#" id="waMail">Email instead</a></div>
+    </div>
+  </div>
+  <button class="fab" id="waFab" aria-expanded="false" aria-controls="waPanel">
+    <span class="pl" aria-hidden="true"></span>
+    <svg width="21" height="21" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.9-4.45 9.9-9.91C21.95 6.45 17.5 2 12.04 2Zm5.8 14.16c-.24.68-1.42 1.3-1.95 1.35-.5.05-.98.23-3.3-.69-2.77-1.09-4.53-3.92-4.67-4.1-.13-.18-1.11-1.48-1.11-2.82s.7-2 .95-2.27c.25-.27.54-.34.72-.34h.52c.17 0 .4-.06.62.48.24.57.8 1.97.87 2.11.07.14.12.3.02.48-.09.18-.14.29-.28.45-.14.16-.29.35-.41.47-.14.14-.28.29-.12.56.16.27.72 1.18 1.54 1.91 1.06.94 1.95 1.23 2.22 1.37.27.14.43.12.59-.07.16-.18.68-.79.86-1.06.18-.27.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.45.2.52.32.07.11.07.66-.17 1.34Z"/></svg>
+    <span class="t">Chat to us</span>
+  </button>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   CONFIG — the only lines you need to change to make this yours
+   ══════════════════════════════════════════════════════════════════════ */
+const EZAY = {
+  whatsapp: "447000000000",             // international, no + or spaces
+  phone:    "+440000000000",
+  email:    "hello@ezaytravels.co.uk",
+  api:      "",                          // "" = demo mode
+  sceneMs:  3000                         // designer's spec was 7000. You asked for 3s.
+};
+
+const IMG = n => `images/${n}.jpg`;   // owned / licensed photography in this repo
+
+/* ══════════════════ scene + offer + band data (from the design spec) ══════ */
+const SCENES = [
+  { chip:"Coastline",   img:IMG("palawan"),   credit:"Bernd Dittrich", kick:"Palawan · long-haul window open", h:"Somewhere you can hear the water.", s:"Book the long-haul leg four months out and the island hop three weeks out — in that order, it is £689 return.", offer:"pal-b" },
+  { chip:"Cappadocia",  img:IMG("cappadocia"), creditText:"Photo: eZAY", kick:"Cappadocia · balloons at first light", h:"Up before the sun, and above it by seven.", s:"Fly midweek into Kayseri, two nights in a cave room, and the balloon slot booked before you land. £389 return in the shoulder window.", offer:"cap-a" },
+  { chip:"Rome by night", img:IMG("rome"),    creditText:"Photo: eZAY", kick:"Rome · shoulder season", h:"The Colosseum, minus the queue.", s:"Late September, midweek, direct from Gatwick. £164 return and the evening light does the rest.", offer:"rom-a" },
+  { chip:"Paris",       img:IMG("paris"),     creditText:"Photo: eZAY", kick:"Paris · two nights, no flight needed", h:"Close enough to go on a Friday.", s:"Eurostar or a 70-minute hop, out Friday evening, back Sunday night. £118 return and we price the hotel with it.", offer:"par-a" },
+  { chip:"Zanzibar",    img:IMG("zanzibar"),  creditText:"Photo: eZAY", kick:"Zanzibar · dry season", h:"White sand, and a dhow at six.", s:"Fly via the Gulf in the June–October dry window. £612 return, and we price Stone Town and the north coast as one trip.", offer:"znz-a" },
+  { chip:"Alps & ski",  img:IMG("alps"),      creditText:"Photo: eZAY", kick:"The Alps · January value window", h:"First lift, and the piste is yours.", s:"Fly the second week of January, dodge New Year and half-term, and we book the transfer and the pass that everyone forgets. £186 return.", offer:"ski-a" },
+  { chip:"Thailand",    img:IMG("thailand"),  creditText:"Photo: eZAY", kick:"Thailand · cool season", h:"Chiang Mai first, islands after.", s:"November to February is the window. Elephants in the morning, night market after, and the domestic hop booked with the long-haul so it actually connects. £624 return.", offer:"tha-a" },
+  { chip:"Lagos lights",img:IMG("lagos"),     credit:"Seun Idowu", kick:"Lagos · Detty December", h:"December, and the city is up all night.", s:"Fares climb from mid-October. Sorted now, £547 return — with the hotel quoted in the same message.", offer:"lagos-b" },
+  { chip:"Nairobi",     img:IMG("nairobi"),   credit:"Grace Nandi", kick:"Nairobi · game park at the city limit", h:"A skyline behind the acacia.", s:"The only capital on earth with a national park inside it. Fly overnight, be on a morning game drive, and still make dinner in Westlands. £498 return.", offer:"nbo-a" }
+];
+
+
+const OFFERS = {
+ "lagos-a":{route:"LHR → LOS",total:684,city:"Lagos LOS",out:"18 Dec",back:"3 Jan",badge:"Direct",bt:"tag-accent-2",det:"18 Dec — 3 Jan · Virgin Atlantic · 6h 30m",brk:"Fare £612 + taxes · our fee £31 · hotel from £58/night"},
+ "lagos-b":{route:"LGW → LOS",total:547,city:"Lagos LOS",out:"17 Dec",back:"4 Jan",badge:"1 stop",bt:"tag-neutral",det:"17 Dec — 4 Jan · Royal Air Maroc · 11h 05m",brk:"Fare £489 + taxes · our fee £28 · hotel from £58/night"},
+ "rom-a":{route:"LGW → FCO",total:164,city:"Rome FCO",out:"24 Sep",back:"28 Sep",badge:"Direct",bt:"tag-accent-2",det:"24 Sep — 28 Sep · ITA Airways · 2h 40m",brk:"Fare £149 + taxes · our fee £15 · hotel from £88/night"},
+ "rom-b":{route:"STN → CIA",total:112,city:"Rome CIA",out:"24 Sep",back:"28 Sep",badge:"Hand bag only",bt:"tag-neutral",det:"24 Sep — 28 Sep · Ryanair · 2h 45m",brk:"Fare £97 + taxes · our fee £15 · hotel from £88/night"},
+ "alp-a":{route:"LHR → ZRH",total:198,city:"Zurich ZRH",out:"10 Jan",back:"17 Jan",badge:"Direct",bt:"tag-accent-2",det:"10 Jan — 17 Jan · SWISS · 1h 50m",brk:"Fare £176 + taxes · our fee £22 · transfer from £46 return"},
+ "alp-b":{route:"LGW → INN",total:172,city:"Innsbruck INN",out:"10 Jan",back:"17 Jan",badge:"Best value",bt:"tag-accent",det:"10 Jan — 17 Jan · easyJet · 2h 05m",brk:"Fare £150 + taxes · our fee £22 · transfer from £46 return"},
+ "ski-a":{route:"LGW → GVA",total:186,city:"Geneva GVA",out:"17 Jan",back:"24 Jan",badge:"Best value",bt:"tag-accent",det:"17 Jan — 24 Jan · easyJet · 1h 40m",brk:"Fare £164 + taxes · our fee £22 · coach £68 return · pass £258"},
+ "ski-b":{route:"LHR → ZRH",total:214,city:"Zurich ZRH",out:"7 Feb",back:"14 Feb",badge:"Zermatt",bt:"tag-accent-2",det:"7 Feb — 14 Feb · SWISS · 1h 50m",brk:"Fare £190 + taxes · our fee £24 · rail to resort £62 return"},
+ "pal-a":{route:"LHR → MNL",total:742,city:"Manila MNL",out:"14 Feb",back:"28 Feb",badge:"1 stop",bt:"tag-neutral",det:"14 Feb — 28 Feb · Qatar Airways · 18h 10m",brk:"Consolidator fare · our fee built in · hotel from £96/night"},
+ "pal-b":{route:"LHR → MNL",total:689,city:"Manila MNL",out:"18 Feb",back:"4 Mar",badge:"Best value",bt:"tag-accent",det:"18 Feb — 4 Mar · Emirates · 20h 25m",brk:"Consolidator fare · our fee built in · hotel from £96/night"},
+ "cap-a":{route:"STN → ASR",total:389,city:"Kayseri ASR",out:"6 Oct",back:"11 Oct",badge:"Best value",bt:"tag-accent",det:"6 Oct — 11 Oct · Pegasus via SAW · 6h 40m",brk:"Fare £352 + taxes · our fee £22 · cave room from £64/night"},
+ "cap-b":{route:"LHR → IST",total:452,city:"Istanbul IST",out:"6 Oct",back:"13 Oct",badge:"Two cities",bt:"tag-accent-2",det:"6 Oct — 13 Oct · Turkish Airlines · 3h 55m + domestic",brk:"Fare £408 + taxes · our fee £26 · balloon slot £168pp"},
+ "znz-a":{route:"LHR → ZNZ",total:612,city:"Zanzibar ZNZ",out:"12 Jul",back:"26 Jul",badge:"Best value",bt:"tag-accent",det:"12 Jul — 26 Jul · Qatar Airways · 14h 20m",brk:"Consolidator fare · our fee £38 · beach room from £71/night"},
+ "znz-b":{route:"LGW → ZNZ",total:698,city:"Zanzibar ZNZ",out:"3 Aug",back:"17 Aug",badge:"1 stop",bt:"tag-neutral",det:"3 Aug — 17 Aug · Emirates · 16h 05m",brk:"Consolidator fare · our fee £38 · Stone Town from £54/night"},
+ "tha-a":{route:"LHR → CNX",total:624,city:"Chiang Mai CNX",out:"9 Nov",back:"25 Nov",badge:"Best value",bt:"tag-accent",det:"9 Nov — 25 Nov · Emirates via DXB · 17h 30m",brk:"Consolidator fare · our fee £36 · guesthouse from £29/night"},
+ "par-a":{route:"LGW → CDG",total:118,city:"Paris CDG",out:"14 Nov",back:"16 Nov",badge:"Direct",bt:"tag-accent-2",det:"14 Nov — 16 Nov · easyJet · 1h 15m",brk:"Fare £104 + taxes · our fee £15 · hotel from £96/night"},
+ "par-b":{route:"STP → PAR",total:149,city:"Paris Nord",out:"12 Dec",back:"14 Dec",badge:"Eurostar",bt:"tag-accent",det:"12 Dec — 14 Dec · Eurostar · 2h 16m city centre to city centre",brk:"Fare £134 · our fee £15 · no airport transfer needed"},
+ "nbo-a":{route:"LHR → NBO",total:498,city:"Nairobi NBO",out:"11 Feb",back:"22 Feb",badge:"Best value",bt:"tag-accent",det:"11 Feb — 22 Feb · Kenya Airways · 8h 45m",brk:"Fare £449 + taxes · our fee £30 · lodge from £64/night"},
+ "nbo-b":{route:"LHR → NBO",total:572,city:"Nairobi NBO",out:"26 Jul",back:"9 Aug",badge:"Migration season",bt:"tag-accent-2",det:"26 Jul — 9 Aug · Qatar Airways · 13h 10m",brk:"Fare £518 + taxes · our fee £34 · Mara add-on from £310"},
+ "tha-b":{route:"LHR → BKK",total:571,city:"Bangkok BKK",out:"14 Jan",back:"1 Feb",badge:"1 stop",bt:"tag-neutral",det:"14 Jan — 1 Feb · Etihad · 15h 45m",brk:"Consolidator fare · our fee £34 · domestic hop £48 each way"}
+};
+
+const BANDS = [
+ {tag:"Detty December · book by September",tc:"tag-accent",h:"Lagos",img:IMG("lagos"),
+  body:"Fares climb hard from mid-October. Consolidator pricing here beats anything on a public search — this is where our long-haul margin lives, and where yours does too.",
+  offers:["lagos-a","lagos-b"],
+  stay:[["Eko Hotel & Suites, Victoria Island","Pool, generator, 20 min to Lekki","from £58","eko","https://www.ekohotels.com","eko2"],
+        ["Serviced flat, Lekki Phase 1","Kitchen, better for two weeks +","from £41","stay-3"]],
+  tr:[["Private car, LOS → island","Meets you inside arrivals · 45–90 min","£24 each way","car"]],
+  note:"We prebook the car. Lagos arrivals at 4am is not where you want to be negotiating a fare."},
+
+ {tag:"Balloons · book the slot before you fly",tc:"tag-accent",h:"Cappadocia",img:IMG("cappadocia"),
+  body:"The balloon slot is the trip, and it sells out weeks before the flight does. We book it with the fare so you are not refreshing a Turkish website at midnight. Shoulder season is October and April.",
+  offers:["cap-a","cap-b"],
+  stay:[["Cave room, Göreme","Walk to the balloon launch field","from £64","stay-2"],
+        ["Boutique hotel, Uçhisar","Quieter, best valley view","from £92","stay-4"]],
+  tr:[["Private car, ASR → Göreme","1h 15m · meets your flight","£38 each way","car"],
+      ["Balloon slot, sunrise","Booked with the flight, not after","£168pp","pass"]],
+  note:"Flights get cancelled for wind roughly one morning in five. Book three nights, not two, and you get a second chance."},
+
+ {tag:"Long weekend · shoulder season",tc:"tag-accent",h:"Rome",img:IMG("rome"),
+  body:"Go late September or February — same city, half the crowd, and the Colosseum at night with nobody in your photo. Short-haul, so our margin is thin and we say so.",
+  offers:["rom-a","rom-b"],
+  stay:[["Guesthouse, Monti","10 min walk to the Colosseum","from £88","stay-3"],
+        ["Apartment, Trastevere","Quieter, best for four nights +","from £102","stay-2"]],
+  tr:[["Leonardo Express, FCO → Termini","Every 15 min · 32 min","£13","rail"]],
+  note:"Flying into Ciampino instead? Coach only — 40 minutes, about £6. We will say which airport is actually cheaper once fees are in."},
+
+ {tag:"Two nights · leave Friday after work",tc:"tag-accent-2",h:"Paris",img:IMG("paris"),
+  body:"The one city where the train usually beats the plane once you count the transfer, the bag and the two hours at the gate. We price both and tell you which actually wins for your dates.",
+  offers:["par-a","par-b"],
+  stay:[["Hotel, 7th arrondissement","Walk to the tower, quiet at night","from £96","stay-4"],
+        ["Apartment, Le Marais","Better for four nights and a group","from £84","stay-2"]],
+  tr:[["Nothing needed on Eurostar","Gare du Nord is already in the centre","£0","rail"],
+      ["RER B, CDG → centre","Every 10 min · 35 min","£10","rail"]],
+  note:"Eurostar lands you in the middle of the city with no transfer. On a two-night trip that is usually two hours and £20 better than flying, even when the fare looks higher."},
+
+ {tag:"Dry season · June to October",tc:"tag-accent-2",h:"Zanzibar",img:IMG("zanzibar"),
+  body:"Two trips in one: Stone Town for the history and the north coast for the water. Book them as one itinerary or you will pay twice for the transfer across the island. Long-haul, so the saving is real.",
+  offers:["znz-a","znz-b"],
+  stay:[["Beach hotel, Nungwi","North coast, swimmable at low tide","from £71","stay-1"],
+        ["Riad-style guesthouse, Stone Town","Two nights either end of the beach","from £54","stay-2"]],
+  tr:[["Private car, ZNZ → Nungwi","1h 20m · meets your flight","£32 each way","car"]],
+  note:"Tide matters more than the hotel. Nungwi and Kendwa stay swimmable; most of the east coast does not. We will say so before you book."},
+
+ {tag:"Ski season · January value window",tc:"tag-accent-2",h:"Alps & ski weeks",img:IMG("alps"),
+  body:"Fly Zurich, Geneva or Innsbruck mid-January and you dodge both the New Year spike and half-term. Flight, coach, lift pass and boot fitting quoted as one number — because that is how the week actually costs. Ski weeks sell out by early November.",
+  offers:["ski-a","alp-a"],
+  stay:[["Ski-in room, Val Thorens","Boots on at the door","from £118","stay-4"],
+        ["Chalet room, Grindelwald","Half board, walk to the station","from £96","stay-2"]],
+  tr:[["Shared coach, GVA → Val Thorens","Saturday transfers · 3h 10m","£68 return","van"],
+      ["6-day lift pass","Quoted with the flight, not after","£258","pass"]],
+  note:"Book the transfer with the flight. Same-day taxis in the valley run three times this, and the Saturday coaches fill first."},
+
+ {tag:"Cool season · November to February",tc:"tag-accent-2",h:"Thailand",img:IMG("thailand"),
+  body:"Chiang Mai for the north, then the islands. The domestic hop has to be booked with the long-haul or the connection does not protect — that single detail is why people miss flights here.",
+  offers:["tha-a","tha-b"],
+  stay:[["Guesthouse, Old City Chiang Mai","Inside the moat, walk everywhere","from £29","stay-3"],
+        ["Beach bungalow, Koh Lanta","Quieter than Phi Phi, good for a week","from £46","stay-1"]],
+  tr:[["Domestic hop, BKK → CNX","Booked on the same ticket","£48 each way","pass"],
+      ["Airport car, CNX → Old City","20 min · fixed price","£11","car"]],
+  note:"Ethical elephant sanctuaries only — no riding, no shows. We will name the ones we actually send people to."},
+
+ {tag:"City and safari · one flight",tc:"tag-accent-2",h:"Nairobi",img:IMG("nairobi"),
+  body:"The only capital on earth with a national park inside the city boundary. You can land at six, be watching giraffe against the skyline by eight, and still be back for dinner. Fly it as a city break, or bolt the Mara on for a week that costs less than most people assume.",
+  offers:["nbo-a","nbo-b"],
+  stay:[["Lodge, Nairobi National Park edge","Wake up to the park, 30 min to town","from £64","stay-2"],
+        ["Boutique hotel, Westlands","Best base for the city, safe to walk","from £58","stay-1"]],
+  tr:[["Private car, NBO → Westlands","45–90 min depending on traffic","£22 each way","car"],
+      ["Half-day park game drive","Guide and vehicle, early start","£78pp","van"]],
+  note:"Traffic decides your day here. We build the transfers around it rather than pretending Nairobi is a 20-minute city."},
+
+ {tag:"Long-haul · two weeks minimum",tc:"tag-accent-2",h:"Palawan",img:IMG("palawan"),
+  body:"Book the long-haul leg 4–5 months out, the island hop three weeks out. Do it the other way round and you pay twice. Budget £95–£140 a night on the coast.",
+  offers:["pal-a","pal-b"],
+  stay:[["Beachfront cabana, El Nido","Fan or air-con, breakfast in","from £96","stay-1"],
+        ["Guesthouse, Coron","Best base for the wreck dives","from £52","stay-3"]],
+  tr:[["Light aircraft, MNL → El Nido","1h 15m · 10kg limit","£118 each way","pass"],
+      ["Van from Puerto Princesa","Cheap, long · 5h","£14","van"]],
+  note:"The 10kg limit on the light aircraft catches people out. Tell us your bags and we will price the van option too."}
+];
+
+
+/* ══════════════════ state ══════════════════ */
+const THUMB = t => t === "eko" ? IMG("hotel-eko-room") : t === "eko2" ? IMG("hotel-eko-pool") : IMG("thumb-" + t);
+const gbp = n => "£" + n.toLocaleString("en-GB");
+let trip = "return", pax = 2, sel = SCENES[0].offer, scene = 0, timer = null;
+
+/* ── hero layers ── */
+const layers = document.getElementById("layers");
+SCENES.forEach((s, i) => {
+  const d = document.createElement("div");
+  d.className = "layer" + (i === 0 ? " on" : "");
+  d.innerHTML = s.art ? ART[s.art] : `<img src="${s.img}" alt="" ${i ? 'loading="lazy"' : ""}>`;
+  layers.appendChild(d);
+});
+const chips = document.getElementById("chips");
+SCENES.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.className = "chip"; b.type = "button"; b.textContent = s.chip;
+  b.setAttribute("aria-pressed", i === 0 ? "true" : "false");
+  b.onclick = () => { clearInterval(timer); timer = null; setScene(i); };
+  chips.appendChild(b);
+});
+function setScene(i) {
+  scene = i;
+  [...layers.children].forEach((l, k) => l.classList.toggle("on", k === i));
+  [...chips.children].forEach((c, k) => c.setAttribute("aria-pressed", k === i ? "true" : "false"));
+  const s = SCENES[i];
+  document.getElementById("kick").textContent = s.kick;
+  document.getElementById("hh").textContent = s.h;
+  document.getElementById("hs").textContent = s.s;
+  document.getElementById("credit").textContent = s.creditText || (s.credit ? `Photo: ${s.credit} · Unsplash` : "");
+  setOffer(s.offer);
+}
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  timer = setInterval(() => setScene((scene + 1) % SCENES.length), EZAY.sceneMs);
+}
+
+/* ── destination bands ── */
+const bandsEl = document.getElementById("destinations");
+BANDS.forEach(b => {
+  const art = `<img src="${b.img}" alt="${b.h}" loading="lazy">`;
+  const cards = b.offers.map(id => {
+    const o = OFFERS[id];
+    return `<button class="offer" type="button" data-offer="${id}" aria-pressed="false">
+      <div class="top"><span class="route">${o.route}</span><span class="tag ${o.bt}">${o.badge}</span></div>
+      <div class="tot">${gbp(o.total)}</div>
+      <div class="det">${o.det}</div>
+      <div class="brk">${o.brk}</div>
+    </button>`;
+  }).join("");
+  const rows = a => a.map(([n, s, p, t, url, t2]) => {
+    const pics = t2
+      ? `<span class="pics"><img class="thumb" src="${THUMB(t)}" alt="" loading="lazy">` +
+        `<img class="thumb" src="${THUMB(t2)}" alt="" loading="lazy"></span>`
+      : `<img class="thumb" src="${THUMB(t)}" alt="" loading="lazy">`;
+    const name = url
+      ? `<a class="nm lnk" href="${url}" target="_blank" rel="noopener">${n}<span aria-hidden="true"> \u2197</span></a>`
+      : `<span class="nm">${n}</span>`;
+    return `<div class="r${t2 ? " wide" : ""}">${pics}` +
+      `<span class="meta">${name}<span class="sb">${s}</span></span>` +
+      `<span class="pr">${p}</span></div>`;
+  }).join("");
+  const el = document.createElement("section");
+  el.className = "band";
+  el.innerHTML = `
+    <div class="row">
+      <div style="flex:1 1 460px;min-width:0;display:flex;flex-direction:column">
+        <div class="panel">${art}<div class="ov"></div>
+          <div class="txt"><span class="tag ${b.tc}">${b.tag}</span><h2>${b.h}</h2><p>${b.body}</p></div>
+        </div>
+        <div class="offers">${cards}</div>
+      </div>
+      <aside class="side">
+        <div><h6>Where to stay</h6><div class="rows">${rows(b.stay)}</div></div>
+        <div class="div"></div>
+        <div><h6>Getting there &amp; around</h6><div class="rows">${rows(b.tr)}</div></div>
+        <p class="note">${b.note}</p>
+      </aside>
+    </div>`;
+  bandsEl.appendChild(el);
+});
+bandsEl.addEventListener("click", e => {
+  const c = e.target.closest("[data-offer]");
+  if (c) { setOffer(c.dataset.offer); document.querySelector(".barwrap").scrollIntoView({ block: "nearest" }); }
+});
+
+/* ── fare bar ── */
+function setOffer(id) {
+  sel = id;
+  const o = OFFERS[id];
+  document.getElementById("to").value = o.city;
+  document.getElementById("dates").value = trip === "return" ? `${o.out} — ${o.back}` : o.out;
+  document.getElementById("tot").textContent = gbp(o.total * pax);
+  document.querySelectorAll("[data-offer]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.offer === id)));
+}
+document.querySelectorAll("[data-trip]").forEach(b => b.onclick = () => {
+  trip = b.dataset.trip;
+  document.querySelectorAll("[data-trip]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  setOffer(sel);
+});
+const setPax = d => { pax = Math.min(9, Math.max(1, pax + d));
+  document.getElementById("pax").textContent = pax === 1 ? "1 adult" : `${pax} adults`; setOffer(sel); };
+document.getElementById("minus").onclick = () => setPax(-1);
+document.getElementById("plus").onclick  = () => setPax(1);
+
+document.getElementById("fare").addEventListener("submit", async e => {
+  e.preventDefault();
+  const go = document.getElementById("go"), was = go.textContent;
+  go.textContent = "Checking 3 sources…";
+  const body = { origin: document.getElementById("from").value, destination: OFFERS[sel].city,
+                 dates: document.getElementById("dates").value, trip, passengers: pax, offer_id: sel };
+  try {
+    if (EZAY.api) {
+      const r = await fetch(EZAY.api + "/api/fares/search", { method: "POST",
+        headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      if (!r.ok) throw 0;
+      sessionStorage.setItem("ezay_quote", await r.text());
+      location.href = "/results";
+      return;
+    }
+  } catch { /* fall through to the enquiry path */ }
+  setTimeout(() => { go.textContent = was;
+    if (!EZAY.api) document.getElementById("enquiry").scrollIntoView({ behavior: "smooth" }); }, 1600);
+});
+
+/* ── enquiry ── */
+let budget = "";
+document.querySelectorAll("#budget button").forEach(b => b.onclick = () => {
+  budget = b.dataset.b;
+  document.querySelectorAll("#budget button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+});
+document.getElementById("enqForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const f = e.target, d = Object.fromEntries(new FormData(f));
+  if (d.website) return;
+  d.budget = budget; d.whatsapp_ok = document.getElementById("ew").checked; d.source = "homepage";
+  const btn = document.getElementById("send");
+  try {
+    if (EZAY.api) await fetch(EZAY.api + "/api/enquiries", { method: "POST",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify(d) });
+  } catch { /* still show sent; the WhatsApp path is the backstop */ }
+  btn.textContent = "Sent — we'll come back within 4 hrs";
+  btn.disabled = true;
+});
+
+/* ── credentials: single place to flip each one as it lands ── */
+[
+  ["Registered company","eZAY Travels and Tours Ltd — company number to be displayed",0],
+  ["Financial protection","Accreditation and licence number to be confirmed before we take payment",0],
+  ["Professional indemnity","Cover being arranged — certificate to be displayed",0],
+  ["Data protection","ICO registration in progress",0],
+  ["Flight content","Duffel — integration in test",0],
+  ["Long-haul net fares","Faremine trade account — application submitted",0],
+  ["Payments","Stripe hosted checkout — card details never touch our systems",1],
+  ["A person answers","Quote back within four working hours, every enquiry",1]
+].forEach(([t,v,done]) => {
+  const d = document.createElement("div");
+  d.className = "cred " + (done ? "done" : "wip");
+  d.innerHTML = `<span class="dot"></span><span><span class="t">${t}</span><span class="v">${v}</span></span>`;
+  document.getElementById("credsGrid").appendChild(d);
+});
+
+/* ── WhatsApp ── */
+const wa = t => `https://wa.me/${EZAY.whatsapp}?text=${encodeURIComponent(t)}`;
+[["Flights","Hi eZAY — I'd like a fare quote. Where and when: "],
+ ["A whole trip, priced together","Hi eZAY — flight, hotel and transfer please. Details: "],
+ ["A group","Hi eZAY — I'm organising a group. Size, destination, dates: "],
+ ["An existing booking","Hi eZAY — question about my booking. Reference: "],
+ ["Something else","Hi eZAY — "]].forEach(([l, t]) => {
+  const b = document.createElement("button");
+  b.className = "qr"; b.type = "button"; b.textContent = l;
+  b.onclick = () => window.open(wa(t), "_blank", "noopener");
+  document.getElementById("waQr").appendChild(b);
+});
+const fab = document.getElementById("waFab"), panel = document.getElementById("waPanel");
+fab.onclick = () => { const open = panel.hidden; panel.hidden = !open; fab.setAttribute("aria-expanded", String(open)); };
+addEventListener("keydown", e => { if (e.key === "Escape" && !panel.hidden) { panel.hidden = true; fab.setAttribute("aria-expanded", "false"); fab.focus(); } });
+document.getElementById("hdrWa").onclick = () => window.open(wa("Hi eZAY — "), "_blank", "noopener");
+document.getElementById("enqWa").onclick = () => window.open(wa("Hi eZAY — "), "_blank", "noopener");
+document.getElementById("enqWa").textContent = "WhatsApp " + EZAY.phone;
+document.getElementById("waCall").href = "tel:" + EZAY.phone;
+document.getElementById("waMail").href = "mailto:" + EZAY.email;
+
+/* fare bar gets a soft backdrop once it detaches from the hero */
+(() => {
+  const wrap = document.querySelector(".barwrap");
+  const sentinel = document.createElement("div");
+  sentinel.style.cssText = "position:absolute;top:0;height:1px;width:1px";
+  wrap.parentNode.insertBefore(sentinel, wrap);
+  new IntersectionObserver(([e]) => wrap.classList.toggle("stuck", e.intersectionRatio === 0),
+    { threshold: [0], rootMargin: "-64px 0px 0px 0px" }).observe(sentinel);
+})();
+
+setScene(0);
+</script>
+</body>
+</html>
