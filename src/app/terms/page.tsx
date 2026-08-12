@@ -47,6 +47,25 @@ export default function TermsPage() {
         </section>
 
         <section>
+          <h2>Registrations &amp; insurance</h2>
+          <ul>
+            <li>Registered company: EZAY TRAVELS AND TOURS LTD, no. 17394853 (England &amp; Wales).</li>
+            <li>
+              Registered with the Information Commissioner&rsquo;s Office (ICO) for data protection
+              — registration number available on request.
+            </li>
+            <li>Public liability insurance: in place.</li>
+            <li>Employers&rsquo; liability insurance: in place.</li>
+            <li>Professional indemnity &amp; identity cover: in place.</li>
+          </ul>
+          <p>
+            Air Travel Organiser&rsquo;s Licence (ATOL): being arranged. Until it is confirmed we
+            make no flight-protection claim and do not sell flights for instant online payment —
+            flights are handled as a written enquiry, which is the current path to book.
+          </p>
+        </section>
+
+        <section>
           <h2>How we source your fares</h2>
           <p>
             A fare can come from three places, and we check all of them before we send you a number.
