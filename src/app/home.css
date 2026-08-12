@@ -86,8 +86,28 @@ body { overflow-x: clip; }                 /* clip, NOT hidden — hidden kills 
 .proof h3 { font-size: 30px; color: var(--color-accent-700); margin-bottom: 6px; }
 .proof p { font-size: 14px; line-height: 1.45; color: var(--color-neutral-800); margin: 0; }
 
+/* destination picker */
+.picker { padding: 48px clamp(16px, 2.4vw, 40px) 8px; }
+.picker-head { max-width: 62ch; margin-bottom: 22px; }
+.picker-head h2 { font-size: clamp(28px, 3.4vw, 42px); margin-bottom: 8px; }
+.picker-head p { margin: 0; font-size: 15px; color: var(--color-neutral-800); }
+.picker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 236px), 1fr)); gap: 16px; }
+.pick { position: relative; display: block; min-height: 232px; border-radius: 26px; overflow: hidden;
+  box-shadow: var(--shadow-md); text-decoration: none; color: var(--color-bg); background: var(--color-night); isolation: isolate; }
+.pick img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.pick:hover { box-shadow: var(--shadow-lg); }
+.pick:hover img { transform: scale(1.06); }
+.pick:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.pick .pick-ov { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, transparent 28%, color-mix(in srgb, var(--color-night) 84%, transparent) 100%); }
+.pick .pick-txt { position: absolute; left: 0; right: 0; bottom: 0; padding: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 7px; }
+.pick .pick-txt .tag { align-self: flex-start; }
+.pick .pick-city { font-family: var(--font-heading); font-size: 27px; line-height: 1; }
+.pick .pick-from { font-size: 13px; font-weight: 600; color: var(--color-neutral-200); }
+
 /* destination bands */
 .bands { display: flex; flex-direction: column; gap: 72px; padding: 44px clamp(16px, 2.4vw, 40px) 80px; }
+.band { scroll-margin-top: 96px; }   /* clear the sticky header + fare bar on jump */
 .band .row { display: flex; flex-wrap: wrap; gap: 18px; align-items: stretch; }
 .panel { position: relative; flex: 1 1 460px; min-width: 0; min-height: clamp(300px, 34vw, 470px); border-radius: 34px; overflow: hidden; box-shadow: var(--shadow-lg); background: var(--color-night); }
 .panel img, .panel svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }

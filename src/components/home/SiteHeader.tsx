@@ -24,8 +24,7 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
       </Link>
       <nav>
         <Link href="/#destinations">Destinations</Link>
-        <Link href="/#sourcing">How we price</Link>
-        <Link href="/#credentials">Where we are</Link>
+        <Link href="/#pricing">How we price</Link>
         <Link href="/#enquiry">Enquire</Link>
       </nav>
       <a

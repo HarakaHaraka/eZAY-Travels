@@ -1,0 +1,87 @@
+# Render Blueprint for eZAY Travels.
+#
+# This wires the Next.js web service to a Postgres database and runs the
+# database migrations + seed on deploy. The seed is what makes the homepage
+# photos and destination bands appear — they are loaded from the database at
+# request time, not hardcoded, so a service with no seeded database renders a
+# stripped-back page with no heroes and no destinations.
+#
+# Apply via: Render dashboard -> Blueprints -> New Blueprint Instance, pointed
+# at this repository. Or use it as a reference for configuring an existing
+# service by hand (see DEPLOY.md).
+#
+# NOTE: while you are seeding on every deploy, editing destination content in
+# the admin will be overwritten on the next deploy. Once you start editing
+# guides in admin, drop `&& npm run seed` from the build command below.
+
+databases:
+  - name: ezay-db
+    databaseName: ezay
+    user: ezay
+    plan: free
+
+services:
+  - type: web
+    name: ezay-travels
+    runtime: node
+    plan: free
+    branch: main
+    # --include=dev forces devDependencies (tsx, prisma, tailwind, typescript)
+    # so the seed and build work even if NODE_ENV=production is set.
+    buildCommand: npm install --include=dev && npx prisma generate && npx prisma migrate deploy && npm run seed && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      # Wired automatically from the database above — do not set by hand.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ezay-db
+          property: connectionString
+      - key: NODE_VERSION
+        value: "22"
+      # Set to your live domain once DNS is pointed (see DEPLOY.md).
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://ezaytravels.co.uk
+
+      # ── Duffel: your TEST token. Paste the value in the Render dashboard. ──
+      - key: DUFFEL_API_KEY
+        sync: false
+
+      # ── Stripe TEST: add when the business bank account is live. ──
+      # Blank is safe: checkout falls back to an in-app demo path.
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+      # ── Accreditation: SHIP BLANK until ATOL is confirmed in writing. ──
+      # Blank = no protection claim rendered, flight checkout disabled,
+      # enquiry form still works. This is deliberate.
+      - key: ATOL_HOLDER_NAME
+        sync: false
+      - key: ATOL_NUMBER
+        sync: false
+
+      # ── Contact details shown on the site. ──
+      - key: WHATSAPP_NUMBER
+        sync: false
+      - key: COMPANY_PHONE
+        sync: false
+      - key: NOTIFY_EMAIL
+        value: hello@ezaytravels.co.uk
+
+      # ── Email: Microsoft 365 business inbox. Paste the password in Render. ──
+      - key: SMTP_HOST
+        value: smtp.office365.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        value: hello@ezaytravels.co.uk
+      - key: SMTP_PASS
+        sync: false
+
+      # ── Admin area password. ──
+      - key: ADMIN_PASSWORD
+        sync: false

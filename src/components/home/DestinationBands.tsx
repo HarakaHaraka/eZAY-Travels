@@ -22,9 +22,9 @@ export function DestinationBands({ bands }: { bands: Band[] }) {
   }
 
   return (
-    <div className="bands wrap" id="destinations">
+    <div className="bands wrap">
       {bands.map((band) => (
-        <section className="band" key={band.slug}>
+        <section className="band" id={`dest-${band.slug}`} key={band.slug}>
           <div className="row">
             <div style={{ flex: '1 1 460px', minWidth: 0, display: 'flex', flexDirection: 'column' }}>
               <div className="panel">

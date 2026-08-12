@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { CredentialsSection } from '@/components/home/CredentialsSection';
 import { DestinationBands } from '@/components/home/DestinationBands';
+import { DestinationPicker } from '@/components/home/DestinationPicker';
 import { EnquiryPanel } from '@/components/home/EnquiryPanel';
 import { FareSelectionProvider } from '@/components/home/FareSelection';
 import { HeroAndFareBar } from '@/components/home/HeroAndFareBar';
@@ -52,7 +52,7 @@ export default async function HomePage() {
           flightsBookable={flightsBookable}
         />
 
-        <section className="proof wrap">
+        <section className="proof wrap" id="pricing">
           <div>
             <h3>3 sources</h3>
             <p>
@@ -72,45 +72,10 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <DestinationPicker bands={bands} />
+
         <DestinationBands bands={bands} />
       </FareSelectionProvider>
-
-      <CredentialsSection />
-
-      <section className="sourcing wrap" id="sourcing">
-        <h2>How we source your fare</h2>
-        <p className="intro">
-          Three places a fare can come from, and we check all of them before we send you a number.
-          Then we tell you which one we used and what we made on it — because you&rsquo;ll find out
-          eventually, and it&rsquo;s better coming from us.
-        </p>
-        <div className="steps">
-          <div className="step">
-            <div className="n">1</div>
-            <h4>The live search</h4>
-            <p>
-              Real-time airline pricing, the same feed the big sites use. Fast, and honest on
-              short-haul.
-            </p>
-          </div>
-          <div className="step">
-            <div className="n">2</div>
-            <h4>Trade net fares</h4>
-            <p>
-              Consolidator pricing you can&rsquo;t see publicly. On long-haul this is usually where
-              your saving comes from.
-            </p>
-          </div>
-          <div className="step">
-            <div className="n">3</div>
-            <h4>Our ticketing partner</h4>
-            <p>
-              Ticketed and issued through an accredited partner. We tell you which fare we used and
-              what we made on it.
-            </p>
-          </div>
-        </div>
-      </section>
 
       <EnquiryPanel whatsappNumber={config.contact.whatsapp} phone={config.contact.phone} />
 
