@@ -1,5 +1,6 @@
 import 'server-only';
 import { prisma } from './db';
+import { toPublicImagePath } from './imagePath';
 
 /**
  * The homepage view model, assembled from DestinationGuide (scenes, bands,
@@ -102,7 +103,7 @@ export async function loadHomepage(): Promise<HomepageData> {
     scenes.push({
       slug: guide.slug,
       chip: guide.chipLabel ?? guide.city,
-      image: guide.heroImage,
+      image: toPublicImagePath(guide.heroImage),
       credit: creditLine(guide.imageCredit, guide.imageLicence),
       kicker: guide.heroKicker ?? '',
       headline: guide.heroHeadline ?? guide.title,
@@ -118,7 +119,7 @@ export async function loadHomepage(): Promise<HomepageData> {
       tag: guide.bandTag ?? '',
       tagTone: guide.bandTagTone ?? 'tag-accent',
       heading: guide.city,
-      image: guide.heroImage,
+      image: toPublicImagePath(guide.heroImage),
       body: guide.bandBody ?? '',
       note: guide.bandNote ?? '',
       offers: guideOffers,
@@ -133,11 +134,14 @@ export async function loadHomepage(): Promise<HomepageData> {
           name: hotel.name,
           note: hotel.distanceNote ?? '',
           fromMinor: cheapest,
-          images: hotel.imageUrls.slice(0, 2),
+          images: hotel.imageUrls.slice(0, 2).map(toPublicImagePath),
           bookingUrl: hotel.bookingUrl,
         };
       }),
-      around: (guide.gettingAround as unknown as AroundRow[] | null) ?? [],
+      around: ((guide.gettingAround as unknown as AroundRow[] | null) ?? []).map((row) => ({
+        ...row,
+        thumb: toPublicImagePath(row.thumb),
+      })),
     });
   }
 
