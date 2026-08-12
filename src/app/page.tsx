@@ -81,7 +81,8 @@ export default async function HomePage() {
       <EnquiryPanel whatsappNumber={config.contact.whatsapp} phone={config.contact.phone} />
 
       <footer>
-        EZAY TRAVELS AND TOURS LTD (trading as Ezay Travels) · Company No. 17394853 · London
+        EZAY TRAVELS AND TOURS LTD (trading as Ezay Travels) · Company No. 17394853 · 181 Barcombe
+        Avenue, London SW2 3BH
         <br />
         <Link href="/terms">Terms, policies &amp; company information</Link> · Fares shown are
         examples — ask us and we&rsquo;ll price your dates properly.
