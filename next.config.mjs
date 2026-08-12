@@ -5,11 +5,14 @@ const nextConfig = {
     // CDN. That is what caused the black panels in the earlier build, per
     // design/images/README.md.
     //
-    // WebP only, deliberately. AVIF encoding is an order of magnitude slower
-    // and the optimiser serialises it, which stalled the ~40 sidebar tiles on
-    // this page for tens of seconds. The saving on a 96px tile does not come
-    // close to paying for that.
-    formats: ['image/webp'],
+    // Serve those files directly, WITHOUT the on-demand optimiser. On a
+    // memory- and CPU-starved host (e.g. Render's free tier) the optimiser
+    // (sharp) intermittently fails to re-encode the larger heroes — paris.jpg
+    // is ~400KB — so the panel renders blank while the small thumbnails scrape
+    // through. That is the "photo flashes for an instant then disappears"
+    // symptom. The photos are already reasonably sized and the platform serves
+    // /public statically, so bypassing the optimiser is the reliable choice.
+    unoptimized: true,
   },
   experimental: {
     /**
