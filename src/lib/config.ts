@@ -82,7 +82,7 @@ export const config = {
     smtpUser: clean('SMTP_USER'),
     smtpPass,
     resendApiKey: resendKey,
-    notifyEmail: clean('NOTIFY_EMAIL') || 'hello@ezaytravels.co.uk',
+    notifyEmail: clean('NOTIFY_EMAIL') || 'coordinator@ezay.co.uk',
     /** Which transport is actually usable, in priority order. */
     transport:
       smtpHost !== '' && smtpPass !== ''
@@ -103,8 +103,8 @@ export const config = {
 
   contact: {
     whatsapp: clean('WHATSAPP_NUMBER') || '447000000000',
-    phone: clean('COMPANY_PHONE') || '+440000000000',
-    email: clean('NOTIFY_EMAIL') || 'hello@ezaytravels.co.uk',
+    phone: clean('COMPANY_PHONE') || '0794356924',
+    email: clean('NOTIFY_EMAIL') || 'coordinator@ezay.co.uk',
   },
 
   admin: {
