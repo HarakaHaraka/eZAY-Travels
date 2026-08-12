@@ -33,11 +33,13 @@ export default function TermsPage() {
         <section>
           <h2>Who we are</h2>
           <p>
-            <strong>EZAY TRAVELS AND TOURS LTD</strong>, trading as <strong>Ezay Travels</strong>.
-            Registered in England &amp; Wales, company number <strong>17394853</strong>, based in
-            London.
+            <strong>EZAY TRAVELS AND TOURS LTD</strong>, trading as <strong>Ezay Travels</strong>,
+            is a UK travel agency arranging flights with matched hotels, transfers and cover for
+            festival and long-haul independent travellers. Registered in England &amp; Wales,
+            company number <strong>17394853</strong>.
           </p>
           <ul>
+            <li>Registered office: 181 Barcombe Avenue, London SW2 3BH.</li>
             <li>Contact: Zay Siyad</li>
             <li>
               Email: <a href={`mailto:${config.contact.email}`}>{config.contact.email}</a>
@@ -158,7 +160,8 @@ export default function TermsPage() {
       </main>
 
       <footer>
-        EZAY TRAVELS AND TOURS LTD (trading as Ezay Travels) · Company No. 17394853 · London
+        EZAY TRAVELS AND TOURS LTD (trading as Ezay Travels) · Company No. 17394853 · 181 Barcombe
+        Avenue, London SW2 3BH
       </footer>
     </>
   );
