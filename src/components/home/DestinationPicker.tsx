@@ -1,23 +1,48 @@
 'use client';
 
 import Image from 'next/image';
+import { useMemo, useState } from 'react';
 import type { Band } from '@/lib/homepage';
 import { formatMoneyWhole } from '@/lib/money';
 import { useFareSelection } from './FareSelection';
 
 /**
- * The interactive destination picker: a grid of photo tiles, one per
- * destination. Choosing a tile selects that destination's headline fare (so
- * the sticky fare bar updates) and jumps down to its band, where the fares,
- * hotels and transfers are laid out as one trip.
+ * Interactive destination picker.
  *
- * This replaces the old "how we source" and "where we are" sections — that
- * copy now lives in the terms / compliance pages. The picker's job is to show,
- * at a glance, how the platform is structured and where partner inventory
- * (fares, stays, transfers) slots into each destination.
+ * Filter tabs (city breaks / beach & pool / festival / adventure) narrow a grid
+ * of photo tiles. Choosing a tile selects that destination's headline fare (so
+ * the sticky bar updates) and jumps to its band, where fares, hotels and
+ * transfers are laid out as one trip. It replaces the old "how we source" and
+ * "where we are" sections — that copy now lives on the /terms page.
+ *
+ * Categories are mapped by slug here rather than in the database so the content
+ * team can keep editing destinations without a schema change; extend the map
+ * when a new destination is seeded.
  */
+const FILTERS = ['All', 'City breaks', 'Beach & pool', 'Festival', 'Adventure & ski'] as const;
+type Filter = (typeof FILTERS)[number];
+
+const CATEGORIES: Record<string, Filter[]> = {
+  lagos: ['Festival', 'City breaks'],
+  cappadocia: ['Adventure & ski'],
+  nairobi: ['City breaks'],
+  zanzibar: ['Beach & pool'],
+  thailand: ['Beach & pool', 'Adventure & ski'],
+  rome: ['City breaks'],
+  'alps-ski': ['Adventure & ski'],
+  palawan: ['Beach & pool'],
+  paris: ['City breaks'],
+};
+
 export function DestinationPicker({ bands }: { bands: Band[] }) {
   const { selectOffer } = useFareSelection();
+  const [filter, setFilter] = useState<Filter>('All');
+
+  const shown = useMemo(
+    () =>
+      filter === 'All' ? bands : bands.filter((b) => (CATEGORIES[b.slug] ?? []).includes(filter)),
+    [bands, filter]
+  );
 
   if (bands.length === 0) return null;
 
@@ -26,13 +51,27 @@ export function DestinationPicker({ bands }: { bands: Band[] }) {
       <div className="picker-head">
         <h2 id="picker-heading">Where could you go?</h2>
         <p>
-          Tap a destination — we&rsquo;ll take you straight to its fares, hotels and transfers,
-          priced together as one trip.
+          Pick a mood or a season. Tap a place and we&rsquo;ll take you to its fares, hotels and
+          transfers, priced together as one trip.
         </p>
       </div>
 
+      <div className="picker-tabs" role="group" aria-label="Filter destinations by type">
+        {FILTERS.map((f) => (
+          <button
+            key={f}
+            type="button"
+            aria-pressed={filter === f}
+            className={`picker-tab${filter === f ? ' on' : ''}`}
+            onClick={() => setFilter(f)}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
       <div className="picker-grid">
-        {bands.map((band) => {
+        {shown.map((band) => {
           const cheapest = band.offers.reduce<number | null>(
             (min, offer) => (min === null || offer.totalMinor < min ? offer.totalMinor : min),
             null
@@ -44,8 +83,6 @@ export function DestinationPicker({ bands }: { bands: Band[] }) {
               key={band.slug}
               className="pick"
               href={`#dest-${band.slug}`}
-              // Selecting here drives the sticky fare bar, then the anchor
-              // scrolls to the full band. Works without JS; this just enriches.
               onClick={() => {
                 if (headlineOfferId) selectOffer(headlineOfferId);
               }}
@@ -69,6 +106,13 @@ export function DestinationPicker({ bands }: { bands: Band[] }) {
           );
         })}
       </div>
+
+      {shown.length === 0 && (
+        <p className="picker-empty">
+          More {filter.toLowerCase()} coming soon — ask us and we&rsquo;ll build one around your
+          dates.
+        </p>
+      )}
     </section>
   );
 }
