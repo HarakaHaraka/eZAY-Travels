@@ -90,9 +90,11 @@ export function HeroAndFareBar({
     });
     if (selectedOffer) params.set('offer', selectedOffer.id);
 
-    // With flight checkout unavailable there is nothing to sell at the end of
-    // a search, so the enquiry form is the path forward — never an error page.
-    router.push(flightsBookable ? `/fares?${params}` : `/enquiry?${params}`);
+    // Always show the fares — that transparency is the whole positioning. The
+    // results page itself handles the not-bookable case: it shows real prices
+    // and routes each one to the enquiry form rather than a dead checkout.
+    void flightsBookable;
+    router.push(`/fares?${params}`);
   }
 
   return (

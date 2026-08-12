@@ -177,14 +177,24 @@ watermark and should be replaced with the property's media pack.
 - **Guides** — index and detail pages with `Article` JSON-LD and an enquiry CTA on every one.
 - **SEO** — per-page metadata, Open Graph, `TravelAgency` JSON-LD on home, sitemap, robots.
 
+- **Fare search, results and offer detail** — Duffel behind a gateway with a fixture fallback,
+  the markup engine applied, offer cards carrying the fee-on-the-line breakdown, brief search
+  logging. Duffel-down shows the enquiry form, never an error page.
+- **The attach step and online booking** — hotel and insurance offered before payment (shown by
+  default, insurance pre-ticked, add-on prices re-derived server-side), then hosted checkout, the
+  confirmation document and the same idempotent payment path. The whole flow is click-through-able
+  with no keys via the demo payment page.
+
 ## What is not built yet
 
-- **Duffel live search and the `/fares` results page.** The gateway interface and the markup
-  engine are done and tested, but the search UI is not, so the fare bar routes to the enquiry
-  form. With accreditation blank there is nothing sellable at the end of a search anyway — but
-  this is the next thing to build.
-- **The attach step and online booking flow.** Blocked behind the same thing.
-- **Duffel Stays.** Hotels come from the registry, not live inventory.
+- **Duffel Stays is stubbed on the live gateway.** `searchStays` returns `[]` with a real key,
+  because Duffel Stays needs a geographic search we cannot build without a coordinate-lookup
+  service. The fixture gateway returns hotels, so the attach flow and the 12% commission maths are
+  fully exercised; the live path shows insurance only and says hotels are quoted by hand. This is
+  the main thing to finish before hotel attach earns anything in production.
+- **No live-key run.** Everything ran against fixtures and the demo payment page. Duffel and
+  Stripe test keys want a real run before go-live, particularly the webhook signature branch,
+  which fixtures cannot exercise.
 - **Transfers and partners admin.** The models exist and are migrated; there are no screens.
 - **Rate limiting is in-process**, so it does not span instances. Behind more than one instance
   it wants moving to Redis.
