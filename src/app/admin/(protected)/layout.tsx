@@ -11,6 +11,7 @@ const NAV = [
   { href: '/admin/orders', label: 'Orders' },
   { href: '/admin/orders/new', label: 'Log manual order' },
   { href: '/admin/hotels', label: 'Hotels' },
+  { href: '/admin/system', label: 'System' },
 ];
 
 /** Everything in this route group requires a valid admin session. */

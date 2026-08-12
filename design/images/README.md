@@ -17,18 +17,20 @@ that is what caused the black panels in the earlier build.
 | `nairobi.jpg` | Nairobi hero + band | Grace Nandi · Unsplash |
 | `palawan.jpg` | Palawan hero + Coastline scene | Supplied by eZAY |
 | `hotel-eko-room.jpg` | Eko Hotel row, sidebar | Supplied by eZAY |
-| `hotel-eko-pool.jpg` | Eko Hotel row, sidebar | Supplied by eZAY |
 | `thumb-*.jpg` | Generic stay / transfer tiles | Generated — replace with supplier imagery |
 
-## Two that need attention before launch
+## Removed
 
-1. **`hotel-eko-pool.jpg` carries a visible photographer's watermark** ("Nana Kwadwo
-   Duah"). It is fine while the site is unpublished, but ask Eko Hotels for their media
-   pack when you open the commission conversation — they will send you clean, approved
-   shots, and it costs one email.
-2. **The `Z_nairobi` file you sent is the watermarked `independenttravelcats` image
-   again — it is not in this folder and must not be used.** `nairobi.jpg` (Grace Nandi,
-   Unsplash) is in its place and is properly licensed.
+- **`hotel-eko-pool.jpg` — DELETED.** It carried a visible photographer's watermark
+  ("Nana Kwadwo Duah") and has been removed from the repo so it cannot ship. Do not
+  reinstate it. When you open the commission conversation with Eko Hotels, ask for their
+  approved media pack — clean shots, licensed for display — and add those instead.
+
+## One more before launch
+
+- **The `Z_nairobi` file you sent is the watermarked `independenttravelcats` image
+  again — it is not in this folder and must not be used.** `nairobi.jpg` (Grace Nandi,
+  Unsplash) is in its place and is properly licensed.
 
 ## The rule
 

@@ -104,6 +104,31 @@ They cover exactly what CLAUDE.md asks for, plus the guards:
 
 ---
 
+## Going live with Duffel — the backend is already the one Duffel requires
+
+Duffel forbids calling their API from a browser: the access token is a password for the account,
+and a browser request would expose it. They require a backend that holds the token and sits
+between your frontend and their API.
+
+That is precisely this app's shape, and it is enforced, not just intended:
+
+- The token is read in **one** file, `src/lib/config.ts`, which begins `import 'server-only'`. If
+  any browser-bundled component imported it, the build would fail.
+- The Duffel SDK lives only in `src/lib/duffel/`, and the gateway is called only from server code.
+- The browser calls **our** `/api/fares/search`; that server route holds the token and calls
+  Duffel. `api.duffel.com` and the token appear nowhere in the client bundle.
+- `tests/duffelTokenIsolation.test.ts` fails the build if a Client Component ever imports the
+  config or the gateway, so this cannot silently regress.
+
+To switch from fixtures to live Duffel:
+
+1. Put your **test** token in `.env` as `DUFFEL_API_KEY=duffel_test_…`. Never in the frontend,
+   never committed.
+2. Restart. The app swaps `MockFlightGateway` for `DuffelFlightGateway` automatically.
+3. Sign into `/admin/system` and press **Test Duffel connection** — a cheap server-side
+   authenticated call that confirms the token works without spending a billable search.
+4. Search a real route; fares now come from Duffel, priced with the markup engine.
+
 ## Environment variables
 
 | Variable | Required | What it does |
@@ -155,8 +180,8 @@ preloaded. **WebP only, deliberately** — AVIF encoding is serialised by the op
 the ~40 sidebar tiles for tens of seconds.
 
 Photography licensing is tracked in `design/images/README.md`. Never add an image without adding
-its row. Two need attention before launch: `hotel-eko-pool.jpg` carries a visible photographer
-watermark and should be replaced with the property's media pack.
+its row. The watermarked `hotel-eko-pool.jpg` has been deleted from the repo; request Eko Hotels'
+approved media pack before adding any replacement.
 
 ---
 

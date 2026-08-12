@@ -43,12 +43,12 @@ export const SEED_HOTELS: SeedHotel[] = [
     distanceNote: 'Pool, generator, 20 min to Lekki',
     supplier: 'direct',
     bookingUrl: 'https://www.ekohotels.com',
-    // Owned/supplied imagery. hotel-eko-pool.jpg carries a visible
-    // photographer watermark and must be replaced with the property's media
-    // pack before launch — see design/images/README.md.
-    imageUrls: ['/images/hotel-eko-room.jpg', '/images/hotel-eko-pool.jpg'],
+    // The watermarked hotel-eko-pool.jpg has been removed. Only the clean
+    // room shot ships. Request Eko Hotels' approved media pack when opening
+    // the commission conversation and add the images then.
+    imageUrls: ['/images/hotel-eko-room.jpg'],
     notes:
-      'Ask for the media pack when opening the commission conversation — the current pool image is watermarked.',
+      'Request the approved media pack from Eko Hotels — the watermarked pool image was removed and must not be reinstated.',
     rates: [{ roomType: 'double', board: 'breakfast', costMinor: 5_200, sellMinor: 5_800 }],
   },
   {

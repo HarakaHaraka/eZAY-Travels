@@ -85,6 +85,15 @@ async function main() {
           },
         },
       });
+    } else {
+      // Keep imagery and notes in step with the seed on re-run — this is what
+      // propagates the removal of the watermarked Eko image to a DB that was
+      // seeded before it was deleted. Rates are left alone so a verified rate
+      // is never silently reset to a placeholder.
+      await prisma.hotel.update({
+        where: { id: existing.id },
+        data: { imageUrls: hotel.imageUrls, notes: hotel.notes },
+      });
     }
   }
 

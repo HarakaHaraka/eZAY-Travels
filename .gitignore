@@ -10,3 +10,6 @@ node_modules/
 .documents/
 .preview/
 .env.test
+
+# TS incremental build info
+*.tsbuildinfo
