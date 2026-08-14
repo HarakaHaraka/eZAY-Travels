@@ -11,7 +11,12 @@ import { canSellFlights } from '@/lib/accreditation';
 import { config } from '@/lib/config';
 import { loadHomepage } from '@/lib/homepage';
 
-export const dynamic = 'force-dynamic';
+// Cache the homepage and refresh it every 5 minutes (ISR) rather than
+// re-querying the database on every request. This makes the page fast and, on
+// a free-tier host, resilient: a brief database hiccup serves the last good
+// render instead of a 500. Seeded destination content changes rarely, so a
+// few minutes of staleness is fine; admin edits appear within the window.
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: 'eZAY Travels — checked across three sources, fee on the line',
