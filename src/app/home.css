@@ -229,3 +229,15 @@ footer { padding: 28px; text-align: center; font-size: 12px; color: var(--color-
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* editable date inputs in the fare bar — match .well input, incl. iOS Safari */
+.well .dates { display: flex; align-items: center; gap: 8px; }
+.well .dates input[type="date"] {
+  -webkit-appearance: none; appearance: none;
+  flex: 1 1 0; width: auto; min-width: 0;
+  border: 0; background: transparent; padding: 0;
+  font: 600 14px var(--font-body); color: var(--color-bg);
+}
+.well .dates input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1); opacity: .7; cursor: pointer;
+}
