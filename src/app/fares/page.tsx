@@ -8,6 +8,7 @@ import { flightGateway } from '@/lib/duffel';
 import { priceOffer, type PricedOffer } from '@/lib/offers';
 import { recordSearch } from '@/lib/searchLog';
 import { OfferCard } from '@/components/fares/OfferCard';
+import { displayAirport } from '@/lib/airports';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,7 @@ export default async function FaresPage({
     trip?: string;
   };
 }) {
-  const originRaw = searchParams.origin ?? 'London LON';
+  const originRaw = searchParams.origin ?? 'LON';
   const destinationRaw = searchParams.destination ?? '';
   const departureDate =
     searchParams.departureDate ??
@@ -91,7 +92,7 @@ export default async function FaresPage({
         </Link>
 
         <h1 style={{ fontSize: 'clamp(28px, 3.4vw, 40px)', marginTop: 10 }}>
-          {origin} → {destination || '…'}
+          {displayAirport(origin)} → {destination ? displayAirport(destination) : '…'}
         </h1>
         <p style={{ color: 'var(--color-neutral-800)' }}>
           {departureDate}
