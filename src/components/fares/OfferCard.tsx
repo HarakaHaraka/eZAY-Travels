@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { PricedOffer } from '@/lib/offers';
 import { formatDuration } from '@/lib/offers';
 import { formatMoneyWhole } from '@/lib/money';
+import { displayAirport } from '@/lib/airports';
 
 function time(iso: string): string {
   return new Intl.DateTimeFormat('en-GB', {
@@ -41,7 +42,7 @@ export function OfferCard({
     <article className="offer" style={{ cursor: 'default' }}>
       <div className="top">
         <span className="route">
-          {offer.slices[0]?.originIata} → {offer.slices[0]?.destinationIata}
+          {displayAirport(offer.slices[0]?.originIata)} → {displayAirport(offer.slices[0]?.destinationIata)}
         </span>
         <span className={`tag ${offer.longHaul ? 'tag-accent-2' : 'tag-neutral'}`}>
           {offer.stops === 0 ? 'Direct' : `${offer.stops} stop${offer.stops > 1 ? 's' : ''}`}
@@ -58,7 +59,7 @@ export function OfferCard({
                 <strong style={{ fontFamily: 'var(--font-heading)' }}>
                   {time(first.departsAt)} — {time(last.arrivesAt)}
                 </strong>{' '}
-                {slice.originIata}→{slice.destinationIata} · {day(first.departsAt)} ·{' '}
+                {displayAirport(slice.originIata)} → {displayAirport(slice.destinationIata)} · {day(first.departsAt)} ·{' '}
                 {formatDuration(slice.durationMinutes)}
               </div>
             );
