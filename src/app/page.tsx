@@ -91,6 +91,14 @@ export default async function HomePage() {
         <br />
         <Link href="/terms">Terms, policies &amp; company information</Link> · Fares shown are
         examples — ask us and we&rsquo;ll price your dates properly.
+        <br />
+        <a href="/terms/terms-of-service.html">Terms of Service</a> ·{' '}
+        <a href="/terms/booking-conditions.html">Booking Conditions</a> ·{' '}
+        <a href="/terms/refunds-and-cancellations.html">Refunds &amp; Cancellations</a> ·{' '}
+        <a href="/terms/who-is-responsible.html">Who Is Liable</a> ·{' '}
+        <a href="/terms/right-of-refusal.html">Right of Refusal</a> ·{' '}
+        <a href="/terms/privacy-notice.html">Privacy Notice</a> ·{' '}
+        <a href="/terms/complaints.html">Complaints</a>
       </footer>
 
       <WhatsAppBubble

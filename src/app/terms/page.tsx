@@ -154,6 +154,19 @@ export default function TermsPage() {
           sell flights to the public. Nothing here is a protection claim.
         </p>
 
+        <section>
+          <h2>Full policy documents</h2>
+          <ul>
+            <li><a href="/terms/terms-of-service.html">Terms of Service</a> — operating model, payments handling, how we work</li>
+            <li><a href="/terms/booking-conditions.html">Booking Conditions</a></li>
+            <li><a href="/terms/refunds-and-cancellations.html">Refunds &amp; Cancellations</a></li>
+            <li><a href="/terms/who-is-responsible.html">Who You Contract With &amp; Who Is Liable</a></li>
+            <li><a href="/terms/right-of-refusal.html">Right of Refusal &amp; Acceptable Use</a></li>
+            <li><a href="/terms/privacy-notice.html">Privacy Notice</a></li>
+            <li><a href="/terms/complaints.html">Complaints &amp; Disputes</a></li>
+          </ul>
+        </section>
+
         <p style={{ marginTop: 24 }}>
           <Link href="/#top">← Back to the homepage</Link>
         </p>
