@@ -102,6 +102,9 @@ services:
       - key: SMTP_PORT
         value: "587"
       - key: SMTP_USER
+        # The Microsoft 365 user that logs in (owner of the shared manager@ mailbox).
+        value: admin@harakatransport.co.uk
+      - key: EMAIL_FROM
         value: manager@ezaytravels.co.uk
       - key: SMTP_PASS
         sync: false
