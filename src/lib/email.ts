@@ -1,7 +1,7 @@
 import 'server-only';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import { config } from './config';
+import { company, config } from './config';
 
 export interface EmailAttachment {
   filename: string;
@@ -50,7 +50,7 @@ async function sendViaSmtp(input: SendEmailInput): Promise<void> {
   });
 
   await transporter.sendMail({
-    from: config.email.smtpUser,
+    from: `${company.tradingName} <${config.email.fromAddress}>`,
     to: input.to,
     subject: input.subject,
     html: input.html,
@@ -66,7 +66,7 @@ async function sendViaResend(input: SendEmailInput): Promise<void> {
   const { Resend } = await import('resend');
   const resend = new Resend(config.email.resendApiKey);
   const { error } = await resend.emails.send({
-    from: config.email.smtpUser || config.email.notifyEmail,
+    from: `${company.tradingName} <${config.email.fromAddress}>`,
     to: input.to,
     subject: input.subject,
     html: input.html,

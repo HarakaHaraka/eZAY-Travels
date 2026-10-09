@@ -103,8 +103,13 @@ export const config = {
   email: {
     smtpHost,
     smtpPort: Number(clean('SMTP_PORT') || 587),
+    /** The account that LOGS IN to the mail server. May be a different mailbox
+     *  from the address customers see — e.g. the Microsoft 365 licensed user that
+     *  owns the shared manager@ mailbox. */
     smtpUser: clean('SMTP_USER'),
     smtpPass,
+    /** The address customers see and reply to. Defaults to the company email. */
+    fromAddress: clean('EMAIL_FROM') || company.email,
     resendApiKey: resendKey,
     notifyEmail: clean('NOTIFY_EMAIL') || company.email,
     /** Which transport is actually usable, in priority order. */
