@@ -21,7 +21,23 @@ must be fast and pleasant to use. These are the *highest-margin* bookings; if th
 makes them feel second-class, the best revenue gets the worst handling.
 
 ## Non-negotiables
-1. **Never store card data.** Stripe hosted Checkout only. No custom card form, ever.
+1. **Never store card data.** No hand-built card form, ever.
+
+   **Amended 9 October 2026, by the owner's written instruction.** Payment happens on
+   eZAY's own page using Stripe's **Payment Element** — Stripe-hosted iframes mounted in
+   our page. The customer never leaves ezaytravels.co.uk and no card detail reaches an
+   eZAY server, so this is stricter than the old hosted-redirect rule, not looser. What
+   stays forbidden is a card input of our own making.
+
+   **And the money order is fixed: authorise → book → capture.** The PaymentIntent is
+   created with `capture_method: 'manual'`, so the card is ring-fenced and nothing is
+   taken. `/api/fares/confirm` then creates the Duffel order and captures ONLY if the
+   ticket was issued; if Duffel refuses, the authorisation is released and the customer
+   is charged nothing. If the ticket is issued but the capture fails, the order is marked
+   `requires_attention` and is NEVER auto-cancelled — a cancelled ticket is a stranded
+   traveller. eZAY is merchant of record and pays the airline from its own Duffel
+   balance, so this ordering is the only thing standing between a customer and paying for
+   a ticket that does not exist. `tests/bookBeforeCharge.test.ts` pins it.
 2. **All money in integer minor units (pence).** Never floats. Store `cost`, `markup`
    and `sale` separately on every line — derive margin at write time, not report time.
 3. **Payments sit behind an interface** (`createCheckout`, `handleWebhook`, `refund`,

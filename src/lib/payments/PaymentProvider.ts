@@ -10,8 +10,21 @@
  * source tree and fails the build if any file outside src/lib/payments/
  * imports Stripe.
  *
- * Hosted checkout only. There is no card form anywhere in this codebase and
- * there must never be one.
+ * Card data never reaches this application. The card fields are Stripe's own
+ * iframes (Payment Element), so this codebase has no card form of its own and
+ * must never have one.
+ *
+ * THE MONEY ORDER MATTERS. eZAY is merchant of record and pays the airline
+ * from its own Duffel balance, so a customer must never be charged for a
+ * ticket that was not issued. The flow is therefore:
+ *
+ *   1. authorise  — ring-fence the money on the card, take nothing
+ *   2. book       — create the order with Duffel; the ticket is issued
+ *   3. capture    — take the money, but only once step 2 has succeeded
+ *
+ * If step 2 fails, the authorisation is cancelled and the customer is charged
+ * nothing. This is why createPaymentIntent, capture and cancelAuthorization
+ * exist alongside the older hosted-checkout call.
  */
 
 export interface CheckoutOrder {
@@ -52,10 +65,45 @@ export interface RefundResult {
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded' | 'unknown';
 
+/** An authorisation held on the customer's card, not yet taken. */
+export interface PaymentAuthorization {
+  /** Provider payment id (Stripe PaymentIntent id). Persisted on the order. */
+  paymentRef: string;
+  /** Returned to the browser so Stripe's own fields can complete the card. */
+  clientSecret: string;
+  /** Safe to expose; the browser needs it to mount Stripe's fields. */
+  publishableKey: string;
+}
+
+export type AuthorizationState =
+  /** Money ring-fenced, nothing taken. Safe to book, then capture. */
+  | 'requires_capture'
+  /** The customer has not finished authorising yet. */
+  | 'incomplete'
+  /** Already captured. */
+  | 'captured'
+  /** Cancelled, failed, or unknown to the provider. */
+  | 'dead';
+
 export interface PaymentProvider {
   readonly name: string;
 
   createCheckout(order: CheckoutOrder): Promise<CheckoutSession>;
+
+  /**
+   * Creates an authorisation that must be captured separately. Nothing is
+   * taken from the customer until capture() is called.
+   */
+  createPaymentIntent(order: CheckoutOrder): Promise<PaymentAuthorization>;
+
+  /** What the provider currently thinks of this authorisation. */
+  authorizationState(paymentRef: string): Promise<AuthorizationState>;
+
+  /** Takes the money. Only ever called after the ticket is issued. */
+  capture(paymentRef: string): Promise<void>;
+
+  /** Releases the hold. The customer is charged nothing. */
+  cancelAuthorization(paymentRef: string, reason?: string): Promise<void>;
 
   /**
    * Verifies the signature and returns a normalised event, or null for an
