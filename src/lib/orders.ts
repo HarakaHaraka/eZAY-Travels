@@ -345,9 +345,26 @@ function confirmationEmailHtml(input: {
  * delivery records nothing new and issues no second document.
  */
 export async function applyPaymentEvent(event: PaymentEvent): Promise<void> {
-  const order = await prisma.order.findUnique({ where: { reference: event.orderRef } });
+  let order = event.orderRef
+    ? await prisma.order.findUnique({ where: { reference: event.orderRef } })
+    : null;
+
+  // Refunds and disputes arrive as Charge events, and a Charge does not carry
+  // the PaymentIntent's metadata — so orderRef is empty on exactly the events
+  // that matter most. Fall back to the payment we already recorded.
+  if (order === null && event.paymentRef) {
+    const payment = await prisma.payment.findUnique({
+      where: { stripePaymentIntent: event.paymentRef },
+      include: { order: true },
+    });
+    order = payment?.order ?? null;
+  }
+
   if (order === null) {
-    console.warn(`Payment event ${event.eventId} for unknown order ${event.orderRef}`);
+    console.warn(
+      `Payment event ${event.eventId} for unknown order ` +
+        `${event.orderRef || '(no reference)'} / payment ${event.paymentRef ?? '(none)'}`
+    );
     return;
   }
 
