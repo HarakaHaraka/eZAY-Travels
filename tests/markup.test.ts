@@ -3,7 +3,7 @@ import { calculateMarkup, isLongHaul, LONG_HAUL_MINUTES } from '@/lib/markup';
 
 /**
  * Config under test (tests/setup.ts), matching .env.example:
- *   short-haul 0.05 (5%), long-haul 0.08 (8%), floor 1000 minor (£10/ticket)
+ *   short-haul 0.05 (5%), long-haul 0.08 (8%), floor 2000 minor (£20/ticket)
  */
 
 describe('rule 1 — short-haul percentage', () => {
@@ -40,47 +40,47 @@ describe('rule 2 — long-haul percentage', () => {
 
 describe('rule 3 — minimum per-ticket floor, applied after the percentage', () => {
   it('lifts a cheap short-haul fare up to the floor', () => {
-    // 5% of £120.00 is £6.00, below the £10.00 floor.
+    // 5% of £120.00 is £6.00, below the £20.00 floor.
     const result = calculateMarkup({ costMinor: 12_000, ticketCount: 1, longHaul: false });
-    expect(result.markupMinor).toBe(1_000);
-    expect(result.totalMinor).toBe(13_000);
+    expect(result.markupMinor).toBe(2_000);
+    expect(result.totalMinor).toBe(14_000);
     expect(result.ruleApplied).toBe('minimum_floor');
   });
 
   it('applies PER TICKET, not per booking', () => {
-    // 5% of £360 = £18.00; floor is 3 × £10.00 = £30.00 and must win.
+    // 5% of £360 = £18.00; floor is 3 × £20.00 = £60.00 and must win.
     const result = calculateMarkup({ costMinor: 36_000, ticketCount: 3, longHaul: false });
-    expect(result.markupMinor).toBe(3_000);
+    expect(result.markupMinor).toBe(6_000);
     expect(result.ruleApplied).toBe('minimum_floor');
   });
 
   it('does not bind once the percentage clears it', () => {
-    // 5% of £400 = £20.00, above the £10.00 single-ticket floor.
-    const result = calculateMarkup({ costMinor: 40_000, ticketCount: 1, longHaul: false });
-    expect(result.markupMinor).toBe(2_000);
+    // 5% of £500 = £25.00, above the £20.00 single-ticket floor.
+    const result = calculateMarkup({ costMinor: 50_000, ticketCount: 1, longHaul: false });
+    expect(result.markupMinor).toBe(2_500);
     expect(result.ruleApplied).toBe('short_haul_pct');
   });
 
   it('can bind on long-haul too when the fare is small and the party large', () => {
-    // 8% of £100 = £8; floor is 4 × £10 = £40.
+    // 8% of £100 = £8; floor is 4 × £20 = £80.
     const result = calculateMarkup({ costMinor: 10_000, ticketCount: 4, longHaul: true });
-    expect(result.markupMinor).toBe(4_000);
+    expect(result.markupMinor).toBe(8_000);
     expect(result.ruleApplied).toBe('minimum_floor');
   });
 
   it('is a floor, never a cap — a large fare keeps its percentage', () => {
     const result = calculateMarkup({ costMinor: 500_000, ticketCount: 1, longHaul: true });
     expect(result.markupMinor).toBe(40_000);
-    expect(result.markupMinor).toBeGreaterThan(1_000);
+    expect(result.markupMinor).toBeGreaterThan(2_000);
   });
 });
 
 describe('the Marrakech case the owner reported', () => {
-  it('charges £20 on a £372.54 two-traveller short-haul fare, not £30', () => {
-    // 5% of £372.54 is £18.63, under the floor; floor is 2 × £10.00 = £20.00.
+  it('charges £40 on a £372.54 two-traveller short-haul fare', () => {
+    // 5% of £372.54 is £18.63, under the floor; floor is 2 × £20.00 = £40.00.
     const result = calculateMarkup({ costMinor: 37_254, ticketCount: 2, longHaul: false });
-    expect(result.markupMinor).toBe(2_000);
-    expect(result.totalMinor).toBe(39_254);
+    expect(result.markupMinor).toBe(4_000);
+    expect(result.totalMinor).toBe(41_254);
     expect(result.ruleApplied).toBe('minimum_floor');
   });
 });

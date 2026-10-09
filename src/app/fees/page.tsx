@@ -21,11 +21,27 @@ export const metadata: Metadata = {
  * page in the same commit.
  */
 const WORKED_EXAMPLES: Array<[trip: string, fare: string, fee: string, total: string]> = [
-  ['Marrakech, 2 travellers, short-haul', '£372.54', '£20.00 (the £10 minimum, twice)', '£392.54'],
-  ['Rome, 1 traveller, short-haul', '£200.00', '£10.00 (5%)', '£210.00'],
-  ['Rome, 1 traveller, cheap fare', '£120.00', '£10.00 (the minimum)', '£130.00'],
+  ['Marrakech, 2 travellers, short-haul', '£372.54', '£40.00 (the £20 minimum, twice)', '£412.54'],
+  ['Rome, 1 traveller, short-haul', '£200.00', '£20.00 (the minimum)', '£220.00'],
+  ['Rome, 1 traveller, pricier fare', '£500.00', '£25.00 (5%)', '£525.00'],
   ['Nairobi, 1 traveller, long-haul', '£500.00', '£40.00 (8%)', '£540.00'],
   ['Jeddah, family of 4, long-haul', '£2,000.00', '£160.00 (8%)', '£2,160.00'],
+];
+
+/**
+ * Extras. Duffel charges $2.00 per paid ancillary, so the handling charge has
+ * to cover that plus the time. These are published here and nowhere else: a
+ * bag upsell shouted beside a Book button is the behaviour customers hate
+ * about the budget airlines, and it is exactly what we are not.
+ */
+const EXTRAS: Array<[extra: string, price: string, note: string]> = [
+  ['Checked bag added to your booking', 'Airline price + £6', 'Nearly always cheaper than paying at the airport'],
+  ['Second or oversized bag', 'Airline price + £8', 'Worth asking about for family luggage runs'],
+  ['Sports or music equipment', 'Airline price + £10', 'We confirm the airline will carry it before you pay'],
+  ['Seat selection, so you sit together', 'Airline price + £4', 'Families with under-12s are often seated together free'],
+  ['Date change or name correction', 'Airline charge + £15', 'We deal with the airline for you'],
+  ['Refund when the airline cancels', 'Free', 'We chase it and pass the money straight back'],
+  ['Group booking, 4 or more on one order', '£60 flat', 'Instead of the per-traveller fee'],
 ];
 
 export default function FeesPage() {
@@ -54,7 +70,7 @@ export default function FeesPage() {
               Americas.
             </li>
             <li>
-              <strong>Never less than £10 per traveller</strong>, so a very cheap fare still covers
+              <strong>Never less than £20 per traveller</strong>, so a very cheap fare still covers
               the work.
             </li>
           </ul>
@@ -96,34 +112,26 @@ export default function FeesPage() {
 
         <section>
           <h2>Extras, when you want them</h2>
+          <p>
+            You will not be chased for any of these. Ask, and we add them at the airline&rsquo;s own
+            price plus a small handling charge for doing it and checking it is right.
+          </p>
           <table>
             <thead>
               <tr>
                 <th>Extra</th>
                 <th>What you pay</th>
+                <th>Note</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Checked bag added to your booking</td>
-                <td>Airline price + £5 handling</td>
-              </tr>
-              <tr>
-                <td>Seat selection (so you sit together)</td>
-                <td>Airline price + £3 handling</td>
-              </tr>
-              <tr>
-                <td>Date change or name correction after booking</td>
-                <td>Airline charge + £15 handling</td>
-              </tr>
-              <tr>
-                <td>Refund processing when the airline cancels</td>
-                <td>£0 — we chase it for you</td>
-              </tr>
-              <tr>
-                <td>Group bookings of 4 or more on one order</td>
-                <td>£40 flat admin fee instead of per-passenger fees</td>
-              </tr>
+              {EXTRAS.map(([extra, price, note]) => (
+                <tr key={extra}>
+                  <td>{extra}</td>
+                  <td>{price}</td>
+                  <td>{note}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </section>

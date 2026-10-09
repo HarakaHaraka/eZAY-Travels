@@ -122,7 +122,7 @@ export const config = {
     longHaulPct: fraction('MARKUP_LONG_HAUL_PCT', 0.08),
     packagePct: fraction('MARKUP_PACKAGE_PCT', 0.1),
     /** Hard floor per ticket, applied AFTER the percentage. */
-    minPerTicketMinor: minorUnits('MARKUP_MIN_PER_TICKET_MINOR', 1000),
+    minPerTicketMinor: minorUnits('MARKUP_MIN_PER_TICKET_MINOR', 2000),
   },
 
   contact: {

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import { DestinationBands } from '@/components/home/DestinationBands';
-import { DestinationPicker } from '@/components/home/DestinationPicker';
+import { DestinationShowcase } from '@/components/home/DestinationShowcase';
 import { EnquiryPanel } from '@/components/home/EnquiryPanel';
 import { FareSelectionProvider } from '@/components/home/FareSelection';
 import { HeroAndFareBar } from '@/components/home/HeroAndFareBar';
@@ -72,9 +71,7 @@ export default async function HomePage() {
 
         <CityBreaks whatsappNumber={config.contact.whatsapp} />
 
-        <DestinationPicker bands={bands} />
-
-        <DestinationBands bands={bands} />
+        <DestinationShowcase bands={bands} />
       </FareSelectionProvider>
 
       <EnquiryPanel whatsappNumber={config.contact.whatsapp} />
