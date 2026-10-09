@@ -10,6 +10,7 @@ import { SiteFooter } from '@/components/site/SiteFooter';
 import { company } from '@/lib/config';
 import { WhatsAppBubble } from '@/components/home/WhatsAppBubble';
 import { canSellFlights } from '@/lib/accreditation';
+import { affiliateDisclosure, affiliateRel } from '@/lib/affiliate';
 import { config } from '@/lib/config';
 import { loadHomepage } from '@/lib/homepage';
 
@@ -71,7 +72,15 @@ export default async function HomePage() {
 
         <CityBreaks whatsappNumber={config.contact.whatsapp} />
 
-        <DestinationShowcase bands={bands} />
+        <DestinationShowcase
+          bands={bands}
+          linkRel={affiliateRel()}
+          stayNote={
+            affiliateDisclosure()
+              ? `${affiliateDisclosure()} Book them yourself, and we will time the flights around them.`
+              : undefined
+          }
+        />
       </FareSelectionProvider>
 
       <EnquiryPanel whatsappNumber={config.contact.whatsapp} />

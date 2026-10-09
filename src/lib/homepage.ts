@@ -1,3 +1,4 @@
+import { affiliateLink } from './affiliate';
 import 'server-only';
 import { prisma } from './db';
 import { toPublicImagePath } from './imagePath';
@@ -135,7 +136,7 @@ export async function loadHomepage(): Promise<HomepageData> {
           note: hotel.distanceNote ?? '',
           fromMinor: cheapest,
           images: hotel.imageUrls.slice(0, 2).map(toPublicImagePath),
-          bookingUrl: hotel.bookingUrl,
+          bookingUrl: hotel.bookingUrl ? affiliateLink(hotel.bookingUrl) : null,
         };
       }),
       around: ((guide.gettingAround as unknown as AroundRow[] | null) ?? []).map((row) => ({

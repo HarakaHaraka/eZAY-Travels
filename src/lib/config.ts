@@ -128,6 +128,11 @@ export const config = {
             : ('console' as const),
   },
 
+  affiliate: {
+    /** Network tracking link with `{url}` where the hotel's page goes. Blank ⇒ plain links. */
+    linkTemplate: clean('AFFILIATE_LINK_TEMPLATE'),
+  },
+
   markup: {
     /** Fractions, not whole percents. 0.05 === 5%. */
     shortHaulPct: fraction('MARKUP_SHORT_HAUL_PCT', 0.05),
