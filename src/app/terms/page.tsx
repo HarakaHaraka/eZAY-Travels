@@ -80,8 +80,8 @@ export default function TermsPage() {
           <h2>How we source your fares</h2>
           <p>
             A fare can come from three places, and we check all of them before we send you a number.
-            Then we tell you which one we used and what we made on it — because you&rsquo;ll find out
-            eventually, and it&rsquo;s better coming from us.
+            Our service fee is a fixed amount per booking, published in full on our{' '}
+            <Link href="/fees">fees page</Link>, and it is already included in every price we quote.
           </p>
           <ul>
             <li>

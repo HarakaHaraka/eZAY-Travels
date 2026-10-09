@@ -70,6 +70,15 @@ services:
       - key: FLIGHT_ONLY_AGENT_MODE
         value: "true"
 
+      # ── Pricing. Mirrors src/lib/config.ts defaults; set here so the live
+      # service cannot silently drift from the published /fees page. ──
+      - key: MARKUP_SHORT_HAUL_PCT
+        value: "0.05"
+      - key: MARKUP_LONG_HAUL_PCT
+        value: "0.08"
+      - key: MARKUP_MIN_PER_TICKET_MINOR
+        value: "1000"
+
       # ── Contact details shown on the site. ──
       # WhatsApp business line, digits only, international format.
       - key: WHATSAPP_NUMBER

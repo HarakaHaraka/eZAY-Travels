@@ -159,7 +159,7 @@ export default async function FaresPage({
         {offers.length > 0 && (
           <>
             <p style={{ marginTop: 22, fontSize: 13, color: 'var(--color-neutral-700)' }}>
-              {offers.length} fares, cheapest first. Prices include our fee, shown on each.
+              {offers.length} fares, cheapest first. Prices are the total you pay, including our service fee.
             </p>
             <div style={{ display: 'grid', gap: 14, marginTop: 10 }}>
               {offers.map((offer) => (

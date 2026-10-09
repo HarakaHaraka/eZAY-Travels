@@ -22,8 +22,16 @@ function day(iso: string): string {
 }
 
 /**
- * The design's offer-card anatomy, including the breakdown line that prints
- * our fee. That line is the positioning — it is never removed.
+ * The offer-card anatomy.
+ *
+ * The price shown is the TOTAL the customer pays, with our service fee already
+ * inside it. The card deliberately does not itemise the fee beside the booking
+ * button: an itemised fee next to a Book button is an invitation to leave and
+ * buy the same seat direct. The fee is published in full on /fees, linked from
+ * the results header and the footer, which is what honesty actually requires —
+ * the total price is never overstated and nothing is hidden from a customer
+ * who looks. The breakdown remains on the order record for the admin margin
+ * view.
  */
 export function OfferCard({
   offer,
@@ -67,10 +75,6 @@ export function OfferCard({
           <div className="brk" style={{ marginTop: 6 }}>
             {carrier?.marketingCarrierName ?? carrier?.marketingCarrier}
             {offer.longHaul ? ' · long-haul' : ''}
-          </div>
-          {/* The fee line. Positioning — never remove. */}
-          <div className="brk" style={{ fontWeight: 600 }}>
-            {offer.breakdown}
           </div>
         </div>
 

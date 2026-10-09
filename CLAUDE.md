@@ -29,14 +29,29 @@ makes them feel second-class, the best revenue gets the worst handling.
    with a lint rule or a test.
 4. **Accreditation config must be safe when blank.** Every protection claim, licence
    number and statement reads from env config — never hardcoded. If `ATOL_HOLDER_NAME`
-   or `ATOL_NUMBER` is blank: render **no** protection claim anywhere, and disable flight
-   checkout (the enquiry form still works and is presented as the path forward). **Ship
-   with these blank.** Write tests proving the blank state behaves this way.
-5. **No placeholder price may render publicly.** `HotelRate.verifiedAt == null` means
+   or `ATOL_NUMBER` is blank, render **no** protection claim anywhere. **Ship with these
+   blank.** Write tests proving it.
+
+   **Amended 9 October 2026, by the owner's written instruction.** Blank accreditation no
+   longer disables flight checkout. eZAY sells **flight-only** tickets as a *disclosed
+   agent* for the airline, issued instantly through Duffel, which sits outside the ATOL
+   scheme — so card payment runs with no protection claim, and the site says plainly that
+   the ticket is not ATOL protected and recommends travel insurance. `FLIGHT_ONLY_AGENT_MODE`
+   now defaults **on**; set it to `false` to take checkout down. **Flight-inclusive packages
+   stay blocked** until a real ATOL claim is configured — that guard is untouched, because a
+   package genuinely does need an ATOL. If the CAA position or the insurer's view changes,
+   flip the default back.
+
+5. **The published fee page must match the code.** `/fees` describes what
+   `src/lib/markup.ts` actually charges. Change both in the same commit, never one alone.
+   The customer-facing price is the TOTAL including our fee; the fee is not itemised beside
+   a Book button (it invites the customer to buy direct), but it is published in full on
+   `/fees` and linked from the results header and the footer.
+6. **No placeholder price may render publicly.** `HotelRate.verifiedAt == null` means
    placeholder. The public site must never show one.
-6. **Secrets in `.env`, gitignored, with a complete `.env.example`.** Never commit a key.
-7. **Duffel and Stripe strictly TEST mode** until told otherwise in writing.
-8. **Webhooks verify signatures and are idempotent.** A replayed webhook must not send a
+7. **Secrets in `.env`, gitignored, with a complete `.env.example`.** Never commit a key.
+8. **Duffel and Stripe strictly TEST mode** until told otherwise in writing.
+9. **Webhooks verify signatures and are idempotent.** A replayed webhook must not send a
    second confirmation email.
 
 ## Design

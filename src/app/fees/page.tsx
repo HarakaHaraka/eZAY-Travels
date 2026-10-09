@@ -13,16 +13,19 @@ export const metadata: Metadata = {
 };
 
 /**
- * The published fee schedule. Fixed per booking, not hidden in the fare.
- * Keep this in step with the service-fee strategy workbook: the bands are
- * chosen so eZAY stays within about £20 of the airline's own price on
- * short-haul and earns its margin on long-haul, groups and changes.
+ * The published fee schedule.
+ *
+ * This page must describe what src/lib/markup.ts ACTUALLY does, not an
+ * aspirational price list: 5% of the fare on short-haul, 8% on long-haul, and
+ * never less than £10 per traveller. If the markup rules change, change this
+ * page in the same commit.
  */
-const FEE_BANDS: Array<[band: string, fee: string, extra: string]> = [
-  ['Short-haul, fare under £120 per person (easyJet, Ryanair, Europe)', '£12', '£5'],
-  ['Fare £120 to £250 per person (North Africa, Turkey, the Med)', '£20', '£8'],
-  ['Fare £250 to £600 per person (Gulf, East Africa, Somalia via Istanbul or Dubai)', '£35', '£10'],
-  ['Fare over £600 per person (long-haul, business class, Umrah groups)', '£50', '£15'],
+const WORKED_EXAMPLES: Array<[trip: string, fare: string, fee: string, total: string]> = [
+  ['Marrakech, 2 travellers, short-haul', '£372.54', '£20.00 (the £10 minimum, twice)', '£392.54'],
+  ['Rome, 1 traveller, short-haul', '£200.00', '£10.00 (5%)', '£210.00'],
+  ['Rome, 1 traveller, cheap fare', '£120.00', '£10.00 (the minimum)', '£130.00'],
+  ['Nairobi, 1 traveller, long-haul', '£500.00', '£40.00 (8%)', '£540.00'],
+  ['Jeddah, family of 4, long-haul', '£2,000.00', '£160.00 (8%)', '£2,160.00'],
 ];
 
 export default function FeesPage() {
@@ -39,31 +42,54 @@ export default function FeesPage() {
         </p>
 
         <section>
-          <h2>Service fee per booking</h2>
+          <h2>How the fee is worked out</h2>
+          <p>Two numbers, and that is the whole rule:</p>
+          <ul>
+            <li>
+              <strong>5% of the fare</strong> on short-haul trips — Europe, Türkiye, Morocco,
+              Tunisia.
+            </li>
+            <li>
+              <strong>8% of the fare</strong> on long-haul trips — Africa, the Gulf, Asia, the
+              Americas.
+            </li>
+            <li>
+              <strong>Never less than £10 per traveller</strong>, so a very cheap fare still covers
+              the work.
+            </li>
+          </ul>
+          <p>
+            The fee is already inside the price you see. There is nothing added at the end, and the
+            price does not change between the search results and the payment page.
+          </p>
+        </section>
+
+        <section>
+          <h2>What that means in practice</h2>
           <table>
             <thead>
               <tr>
-                <th>Fare band (return, per person)</th>
-                <th>Fee for the booking</th>
-                <th>Each extra passenger</th>
+                <th>Trip</th>
+                <th>Airline fare</th>
+                <th>Our fee</th>
+                <th>You pay</th>
               </tr>
             </thead>
             <tbody>
-              {FEE_BANDS.map(([band, fee, extra]) => (
-                <tr key={band}>
-                  <td>{band}</td>
+              {WORKED_EXAMPLES.map(([trip, fare, fee, total]) => (
+                <tr key={trip}>
+                  <td>{trip}</td>
+                  <td>{fare}</td>
                   <td>{fee}</td>
-                  <td>{extra}</td>
+                  <td>
+                    <strong>{total}</strong>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
           <p>
-            Example: two of you to Marrakech on easyJet at £110 each. Fare £220, service fee £12 +
-            £5 = £17, total £237. That is the number you pay, and the £17 is shown on the line.
-          </p>
-          <p>
-            <strong>Launch offer:</strong> the service fee is £0 on our first ten bookings. We ask
+            <strong>Launch offer:</strong> no service fee at all on our first ten bookings. We ask
             for an honest Google review in return.
           </p>
         </section>
