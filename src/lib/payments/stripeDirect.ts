@@ -248,6 +248,36 @@ export function normaliseStripeEvent(event: any): PaymentEvent | null {
       : (object.payment_intent?.id ?? null);
 
   switch (event.type) {
+    // The live path since 9 October: payment is a PaymentIntent authorised on
+    // our own page and captured after the Duffel order. The confirm route
+    // already records all of this synchronously, so these events are a
+    // backstop for the case where our response was lost in flight.
+    case 'payment_intent.succeeded':
+      return {
+        eventId: event.id,
+        type: 'succeeded',
+        orderRef: object.metadata?.orderRef ?? '',
+        sessionId: null,
+        paymentRef: object.id ?? null,
+        amountMinor: object.amount_received ?? object.amount ?? 0,
+        currency: (object.currency ?? 'gbp').toUpperCase(),
+        occurredAt,
+      };
+
+    case 'payment_intent.payment_failed':
+    case 'payment_intent.canceled':
+      return {
+        eventId: event.id,
+        type: 'failed',
+        orderRef: object.metadata?.orderRef ?? '',
+        sessionId: null,
+        paymentRef: object.id ?? null,
+        amountMinor: object.amount ?? 0,
+        currency: (object.currency ?? 'gbp').toUpperCase(),
+        occurredAt,
+      };
+
+    // Kept for the older hosted-checkout path and for any session still open.
     case 'checkout.session.completed':
       return {
         eventId: event.id,
