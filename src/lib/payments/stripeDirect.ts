@@ -9,6 +9,7 @@ import type {
   PaymentProvider,
   PaymentStatus,
   RefundResult,
+  WalletStatus,
 } from './PaymentProvider';
 import { stripeClient } from './stripeSdk';
 
@@ -148,6 +149,35 @@ export class StripeDirectProvider implements PaymentProvider {
       // An uncaptured authorisation expires on its own within about 7 days.
       console.error(`Could not cancel authorisation ${paymentRef}:`, error);
     }
+  }
+
+  async walletStatus(): Promise<WalletStatus | null> {
+    if (config.payments.demoMode) return null;
+
+    let host: string;
+    try {
+      host = new URL(config.siteUrl).host;
+    } catch {
+      return null;
+    }
+
+    const { data } = await stripeClient().paymentMethodDomains.list({
+      domain_name: host,
+      limit: 1,
+    });
+    const domain = data[0];
+
+    if (domain === undefined) {
+      return { domainName: host, registered: false, applePay: false, googlePay: false, link: false };
+    }
+
+    return {
+      domainName: host,
+      registered: domain.enabled,
+      applePay: domain.apple_pay?.status === 'active',
+      googlePay: domain.google_pay?.status === 'active',
+      link: domain.link?.status === 'active',
+    };
   }
 
   async handleWebhook(
