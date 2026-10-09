@@ -57,20 +57,35 @@ services:
         sync: false
 
       # ── Accreditation: SHIP BLANK until ATOL is confirmed in writing. ──
-      # Blank = no protection claim rendered, flight checkout disabled,
-      # enquiry form still works. This is deliberate.
+      # Blank = no protection claim rendered anywhere. This is deliberate.
       - key: ATOL_HOLDER_NAME
         sync: false
       - key: ATOL_NUMBER
         sync: false
 
+      # Flight-only agent mode. eZAY sells flight-only tickets as a disclosed
+      # agent for the airline, issued instantly, which sits outside the ATOL
+      # scheme. "true" turns card checkout on for those WITHOUT rendering any
+      # protection claim; packages stay blocked until a real ATOL claim is set.
+      - key: FLIGHT_ONLY_AGENT_MODE
+        value: "true"
+
       # ── Contact details shown on the site. ──
+      # WhatsApp business line, digits only, international format.
       - key: WHATSAPP_NUMBER
-        sync: false
+        value: "447849549140"
+      # Held for records; the site does not display a phone number.
       - key: COMPANY_PHONE
-        sync: false
+        value: "+44 7849 549140"
+      - key: COMPANY_EMAIL
+        value: manager@ezaytravels.co.uk
       - key: NOTIFY_EMAIL
-        value: hello@ezaytravels.co.uk
+        value: manager@ezaytravels.co.uk
+
+      # ICO data-protection registration reference. Blank until it is issued;
+      # the footer prints it as soon as a value is set here.
+      - key: ICO_REFERENCE
+        sync: false
 
       # ── Email: Microsoft 365 business inbox. Paste the password in Render. ──
       - key: SMTP_HOST
@@ -78,7 +93,7 @@ services:
       - key: SMTP_PORT
         value: "587"
       - key: SMTP_USER
-        value: hello@ezaytravels.co.uk
+        value: manager@ezaytravels.co.uk
       - key: SMTP_PASS
         sync: false
 

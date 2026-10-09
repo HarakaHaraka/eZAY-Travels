@@ -25,10 +25,22 @@ Fixing it is: attach a Postgres database, load the data into it, redeploy.
    | `NODE_VERSION` | `22` |
    | `NEXT_PUBLIC_SITE_URL` | `https://ezaytravels.co.uk` |
    | `DUFFEL_API_KEY` | *(your Duffel **test** token)* |
-   | `WHATSAPP_NUMBER` | *(your WhatsApp number, digits only, e.g. `447…`)* |
-   | `COMPANY_PHONE` | *(your phone, e.g. `+44…`)* |
-   | `NOTIFY_EMAIL` | `hello@ezaytravels.co.uk` |
+   | `FLIGHT_ONLY_AGENT_MODE` | `true` |
+   | `WHATSAPP_NUMBER` | `447849549140` |
+   | `COMPANY_PHONE` | `+44 7849 549140` |
+   | `COMPANY_EMAIL` | `manager@ezaytravels.co.uk` |
+   | `NOTIFY_EMAIL` | `manager@ezaytravels.co.uk` |
+   | `ICO_REFERENCE` | *(leave blank until the ICO reference arrives)* |
    | `ADMIN_PASSWORD` | *(a strong password for the admin area)* |
+
+   `FLIGHT_ONLY_AGENT_MODE=true` is what turns card checkout on for
+   flight-only tickets. eZAY sells them as a disclosed agent for the airline
+   and they are issued instantly, so they sit outside the ATOL scheme: the
+   site renders **no** protection claim, says plainly that the ticket is not
+   ATOL protected, and keeps packages blocked. Leave `ATOL_HOLDER_NAME` and
+   `ATOL_NUMBER` blank. The site only displays a phone number if you add one
+   to the footer by hand — `COMPANY_PHONE` is held for records, and the
+   WhatsApp bubble links to `WHATSAPP_NUMBER` without showing it.
 
    Leave **Stripe** and **ATOL** keys blank for now — that is deliberate and safe
    (checkout falls back to a demo path; no protection claim is shown until ATOL
