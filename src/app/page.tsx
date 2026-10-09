@@ -1,16 +1,16 @@
 import type { Metadata } from 'next';
-import { DestinationShowcase } from '@/components/home/DestinationShowcase';
 import { EnquiryPanel } from '@/components/home/EnquiryPanel';
 import { FareSelectionProvider } from '@/components/home/FareSelection';
 import { HeroAndFareBar } from '@/components/home/HeroAndFareBar';
 import { SiteHeader } from '@/components/home/SiteHeader';
-import { CityBreaks } from '@/components/home/CityBreaks';
+import { PulseStrip } from '@/components/home/PulseStrip';
 import { CredentialsSection } from '@/components/home/CredentialsSection';
 import { SiteFooter } from '@/components/site/SiteFooter';
 import { company } from '@/lib/config';
 import { WhatsAppBubble } from '@/components/home/WhatsAppBubble';
 import { canSellFlights } from '@/lib/accreditation';
-import { affiliateDisclosure, affiliateRel } from '@/lib/affiliate';
+import { cityBreakScenes } from '@/lib/cityBreaks';
+import { pulseItems } from '@/lib/pulse';
 import { config } from '@/lib/config';
 import { loadHomepage } from '@/lib/homepage';
 
@@ -29,7 +29,10 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const { scenes, bands, offers } = await loadHomepage();
+  const { scenes: guideScenes, offers } = await loadHomepage();
+  // One rotating hero for every destination: photographed guides first, then
+  // the city breaks still waiting for licensed imagery.
+  const scenes = [...guideScenes, ...cityBreakScenes(config.contact.whatsapp)];
   const flightsBookable = canSellFlights();
 
   const jsonLd = {
@@ -70,18 +73,9 @@ export default async function HomePage() {
           flightsBookable={flightsBookable}
         />
 
-        <CityBreaks whatsappNumber={config.contact.whatsapp} />
-
-        <DestinationShowcase
-          bands={bands}
-          linkRel={affiliateRel()}
-          stayNote={
-            affiliateDisclosure()
-              ? `${affiliateDisclosure()} Book them yourself, and we will time the flights around them.`
-              : undefined
-          }
-        />
       </FareSelectionProvider>
+
+      <PulseStrip items={pulseItems(config.contact.whatsapp)} social={config.social} />
 
       <EnquiryPanel whatsappNumber={config.contact.whatsapp} />
 

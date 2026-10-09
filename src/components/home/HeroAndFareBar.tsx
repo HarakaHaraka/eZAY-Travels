@@ -121,11 +121,59 @@ export function HeroAndFareBar({
     return () => observer.disconnect();
   }, []);
 
-  const pickScene = useCallback((index: number) => {
-    // Once someone chooses for themselves, stop rotating under them.
-    paused.current = true;
-    setSceneIndex(index);
-  }, []);
+  /**
+   * One click goes to the destination; two clicks skip to the next one.
+   * A single click is held for a beat so a double-click never also navigates.
+   * A swipe on touch does the same as the clicks, left for next, right for
+   * previous. Any of these stops the auto-rotation: a panel that moves while
+   * someone is deciding is worse than no rotation.
+   */
+  const clickTimer = useRef<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
+
+  const skip = useCallback(
+    (direction: 1 | -1) => {
+      paused.current = true;
+      setSceneIndex((current) => (current + direction + scenes.length) % scenes.length);
+    },
+    [scenes.length]
+  );
+
+  const open = useCallback(() => {
+    if (!scene) return;
+    if (scene.external) window.open(scene.href, '_blank', 'noopener');
+    else router.push(scene.href);
+  }, [scene, router]);
+
+  function onHeroClick() {
+    if (clickTimer.current) {
+      window.clearTimeout(clickTimer.current);
+      clickTimer.current = null;
+      skip(1);
+      return;
+    }
+    clickTimer.current = window.setTimeout(() => {
+      clickTimer.current = null;
+      open();
+    }, 260);
+  }
+
+  function onTouchStart(event: React.TouchEvent) {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  }
+  function onTouchEnd(event: React.TouchEvent) {
+    const start = touchStartX.current;
+    touchStartX.current = null;
+    if (start === null) return;
+    const dx = (event.changedTouches[0]?.clientX ?? start) - start;
+    if (Math.abs(dx) < 48) return;
+    // A real swipe must not also count as the tap that follows it.
+    if (clickTimer.current) {
+      window.clearTimeout(clickTimer.current);
+      clickTimer.current = null;
+    }
+    skip(dx < 0 ? 1 : -1);
+  }
 
   const totalMinor = (selectedOffer?.totalMinor ?? 0) * pax;
   // The headline total belongs to the selected offer. Once the typed
@@ -176,41 +224,73 @@ export function HeroAndFareBar({
 
   return (
     <>
-      <section className="hero" id="top">
+      <section
+        className="hero is-live"
+        id="top"
+        aria-roledescription="carousel"
+        aria-label="Destinations"
+        onClick={onHeroClick}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowRight') skip(1);
+          if (event.key === 'ArrowLeft') skip(-1);
+          if (event.key === 'Enter') open();
+        }}
+        tabIndex={0}
+      >
         <div id="layers" aria-hidden="true">
           {scenes.map((s, index) => (
-            <div key={s.slug} className={`layer${index === sceneIndex ? ' on' : ''}`}>
-              <Image
-                src={s.image}
-                alt=""
-                fill
-                sizes="100vw"
-                // The first hero image is the LCP element.
-                priority={index === 0}
-                loading={index === 0 ? 'eager' : 'lazy'}
-                quality={82}
-              />
+            <div
+              key={s.slug}
+              className={`layer${index === sceneIndex ? ' on' : ''}`}
+              style={s.image ? undefined : { background: s.wash }}
+            >
+              {s.image && (
+                <Image
+                  src={s.image}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  // The first hero image is the LCP element.
+                  priority={index === 0}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  quality={82}
+                />
+              )}
             </div>
           ))}
         </div>
         <div className="scrim" aria-hidden="true" />
-        <div className="inner wrap" style={{ width: '100%' }}>
+        <div className="inner wrap" style={{ width: '100%' }} aria-live="polite">
           <span className="tag kick">{scene?.kicker}</span>
           <h1>{scene?.headline}</h1>
           <p className="sub">{scene?.sub}</p>
-          <div className="chips" role="group" aria-label="Featured destinations">
-            {scenes.map((s, index) => (
-              <button
-                key={s.slug}
-                className="chip"
-                type="button"
-                aria-pressed={index === sceneIndex}
-                onClick={() => pickScene(index)}
-              >
-                {s.chip}
-              </button>
-            ))}
-          </div>
+          {scene && scene.stays.length > 0 && (
+            <p className="hero-stays">
+              Stay:{' '}
+              {scene.stays.map((stay, i) => (
+                <span key={stay.name}>
+                  {i > 0 && ' · '}
+                  <a
+                    href={stay.url}
+                    target="_blank"
+                    rel="sponsored noopener"
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    {stay.name} ↗
+                  </a>
+                </span>
+              ))}
+            </p>
+          )}
+          <p className="hero-hint">
+            {scene?.external ? 'Tap for a quote' : 'Tap to open the guide'} · double-tap for the next
+            place · {sceneIndex + 1} of {scenes.length}
+          </p>
+        </div>
+        <div className="hero-progress" aria-hidden="true">
+          <span key={sceneIndex} style={{ animationDuration: `${rotationMs}ms` }} />
         </div>
         <span className="credit">{scene?.credit ?? ''}</span>
       </section>
