@@ -15,6 +15,19 @@ const checkoutSchema = z.object({
       z.object({
         givenName: z.string().trim().min(1, 'Every traveller needs a first name.'),
         familyName: z.string().trim().min(1, 'Every traveller needs a last name.'),
+        // Airlines require a date of birth to issue a ticket. Collect it here
+        // rather than discover it missing when Duffel rejects the order.
+        bornOn: z
+          .string()
+          .trim()
+          .regex(/^\d{4}-\d{2}-\d{2}$/, 'Please give each traveller\u2019s date of birth.')
+          .refine((value) => {
+            const date = new Date(`${value}T00:00:00Z`);
+            if (Number.isNaN(date.getTime())) return false;
+            const now = Date.now();
+            // A real date, in the past, and nobody is over 120.
+            return date.getTime() < now && now - date.getTime() < 120 * 365.25 * 86_400_000;
+          }, 'That date of birth does not look right.'),
       })
     )
     .min(1),
@@ -132,7 +145,11 @@ export async function POST(request: Request) {
       email: input.contactEmail,
       phone: input.contactPhone,
     },
-    passengers: input.passengers,
+    passengers: input.passengers.map((p) => ({
+      givenName: p.givenName,
+      familyName: p.familyName,
+      dateOfBirth: new Date(`${p.bornOn}T00:00:00Z`),
+    })),
     items,
   });
 
