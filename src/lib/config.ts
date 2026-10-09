@@ -131,6 +131,8 @@ export const config = {
   affiliate: {
     /** Network tracking link with `{url}` where the hotel's page goes. Blank ⇒ plain links. */
     linkTemplate: clean('AFFILIATE_LINK_TEMPLATE'),
+    /** Travelpayouts account number (public). Loads their Drive script on content pages. */
+    travelpayoutsId: clean('TRAVELPAYOUTS_ID'),
   },
 
   markup: {
