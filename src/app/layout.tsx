@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Caprasimo, Figtree } from 'next/font/google';
 import { config } from '@/lib/config';
+import { AffiliateDrive } from '@/components/site/AffiliateDrive';
 import './organic.css';
 import './home.css';
 import './globals.css';
@@ -52,7 +53,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={`${caprasimo.variable} ${figtree.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <AffiliateDrive accountId={config.affiliate.travelpayoutsId} />
+      </body>
     </html>
   );
 }
