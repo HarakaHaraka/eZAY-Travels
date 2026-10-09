@@ -52,8 +52,6 @@ export function DestinationBands({ bands }: { bands: Band[] }) {
                     </div>
                     <div className="tot">{formatMoneyWhole(offer.totalMinor)}</div>
                     <div className="det">{offer.detail}</div>
-                    {/* The breakdown line prints our fee. It is the positioning. */}
-                    <div className="brk">{offer.breakdown}</div>
                   </button>
                 ))}
               </div>

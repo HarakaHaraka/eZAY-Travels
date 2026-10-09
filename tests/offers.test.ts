@@ -78,10 +78,9 @@ describe('priceOffer', () => {
       })
     );
     expect(priced.longHaul).toBe(false);
-    // 5% of £200 = £10.00, which exactly meets the £10.00 floor, so the
-    // percentage rule stands (the floor only wins when it is strictly higher).
-    expect(priced.markupMinor).toBe(1_000);
-    expect(priced.ruleApplied).toBe('short_haul_pct');
+    // 5% of £200 = £10.00, under the £20.00 floor, so the floor binds.
+    expect(priced.markupMinor).toBe(2_000);
+    expect(priced.ruleApplied).toBe('minimum_floor');
   });
 
   it('reports stops from the segment count', () => {

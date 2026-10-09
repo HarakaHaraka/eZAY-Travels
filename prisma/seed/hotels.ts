@@ -34,6 +34,18 @@ export interface SeedHotel {
   rates: SeedRate[];
 }
 
+/**
+ * Accommodation we rate, linked to the hotel's own booking page.
+ *
+ * eZAY takes no payment for accommodation (the insurance covers flights only)
+ * and earns nothing from these links today — they are here so a traveller can
+ * plan the whole trip. Linking out is lawful; HOSTING someone else's photo is
+ * not, whether or not money changes hands, so every imageUrl below is one we
+ * own or licence. To use a hotel's own photography, ask that hotel for its
+ * media pack in writing and record the permission here before adding the file.
+ * The commercial upgrade is an affiliate programme (Booking.com, Stay22,
+ * Travelpayouts): those grant image rights AND pay commission.
+ */
 export const SEED_HOTELS: SeedHotel[] = [
   {
     name: 'Eko Hotel & Suites, Victoria Island',
@@ -52,85 +64,85 @@ export const SEED_HOTELS: SeedHotel[] = [
     rates: [{ roomType: 'double', board: 'breakfast', costMinor: 5_200, sellMinor: 5_800 }],
   },
   {
-    name: 'Serviced flat, Lekki Phase 1',
+    name: 'The George, Ikoyi',
     city: 'Lagos',
     country: 'Nigeria',
-    starRating: null,
-    distanceNote: 'Kitchen, better for two weeks +',
+    starRating: 5,
+    distanceNote: 'Quiet Ikoyi, 25 min to the airport',
     supplier: 'direct',
-    bookingUrl: null,
+    bookingUrl: 'https://www.thegeorgelagos.com',
     imageUrls: ['/images/thumb-stay-3.jpg'],
     notes: null,
     rates: [{ roomType: 'double', board: 'room_only', costMinor: 3_600, sellMinor: 4_100 }],
   },
   {
-    name: 'Cave room, Göreme',
+    name: 'Sultan Cave Suites, Göreme',
     city: 'Cappadocia',
     country: 'Türkiye',
     starRating: 4,
     distanceNote: 'Walk to the balloon launch field',
     supplier: 'direct',
-    bookingUrl: null,
+    bookingUrl: 'https://www.sultancavesuites.com',
     imageUrls: ['/images/thumb-stay-2.jpg'],
     notes: null,
     rates: [{ roomType: 'double', board: 'breakfast', costMinor: 5_700, sellMinor: 6_400 }],
   },
   {
-    name: 'Boutique hotel, Uçhisar',
+    name: 'Argos in Cappadocia, Uçhisar',
     city: 'Cappadocia',
     country: 'Türkiye',
     starRating: 4,
     distanceNote: 'Quieter, best valley view',
     supplier: 'direct',
-    bookingUrl: null,
+    bookingUrl: 'https://www.argosincappadocia.com',
     imageUrls: ['/images/thumb-stay-4.jpg'],
     notes: null,
     rates: [{ roomType: 'double', board: 'breakfast', costMinor: 8_200, sellMinor: 9_200 }],
   },
   {
-    name: 'Lodge, Nairobi National Park edge',
+    name: 'Ololo Safari Lodge, Nairobi National Park',
     city: 'Nairobi',
     country: 'Kenya',
     starRating: 4,
     distanceNote: 'Wake up to the park, 30 min to town',
     supplier: 'direct',
-    bookingUrl: null,
+    bookingUrl: 'https://www.ololosafarilodge.com',
     imageUrls: ['/images/thumb-stay-2.jpg'],
     notes: null,
     rates: [{ roomType: 'double', board: 'breakfast', costMinor: 5_700, sellMinor: 6_400 }],
   },
   {
-    name: 'Boutique hotel, Westlands',
+    name: 'Sankara Nairobi, Westlands',
     city: 'Nairobi',
     country: 'Kenya',
     starRating: 4,
     distanceNote: 'Best base for the city, safe to walk',
     supplier: 'direct',
-    bookingUrl: null,
+    bookingUrl: 'https://www.sankara.com',
     imageUrls: ['/images/thumb-stay-1.jpg'],
     notes: null,
     rates: [{ roomType: 'double', board: 'breakfast', costMinor: 5_200, sellMinor: 5_800 }],
   },
   {
-    name: 'Beach hotel, Nungwi',
+    name: 'Zuri Zanzibar, Kendwa',
     city: 'Zanzibar',
     country: 'Tanzania',
     starRating: 4,
     distanceNote: 'North coast, swimmable at low tide',
     supplier: 'direct',
-    bookingUrl: null,
+    bookingUrl: 'https://www.zurizanzibar.com',
     imageUrls: ['/images/thumb-stay-1.jpg'],
     notes: 'Tide matters more than the property here — confirm the coast before quoting.',
     rates: [{ roomType: 'double', board: 'half_board', costMinor: 6_400, sellMinor: 7_100 }],
   },
   {
-    name: 'Riad-style guesthouse, Stone Town',
+    name: 'Emerson on Hurumzi, Stone Town',
     city: 'Zanzibar',
     country: 'Tanzania',
     starRating: 3,
     distanceNote: 'Two nights either end of the beach',
     supplier: 'direct',
-    bookingUrl: null,
+    bookingUrl: 'https://www.emersonhotels.com',
     imageUrls: ['/images/thumb-stay-2.jpg'],
     notes: null,
     rates: [{ roomType: 'double', board: 'breakfast', costMinor: 4_800, sellMinor: 5_400 }],
