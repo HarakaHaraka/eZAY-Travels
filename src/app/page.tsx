@@ -21,9 +21,9 @@ import { loadHomepage } from '@/lib/homepage';
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: 'eZAY Travels — checked across three sources, fee on the line',
+  title: 'eZAY Travels — flights to Africa, the Gulf, Türkiye and the Med, booked in a tap',
   description:
-    'London flight agency for families, groups and independent travellers flying to Africa, the Gulf, Turkey and the Med. Honest prices, our fee printed on the line, a reply within the hour.',
+    'London flight agency for families, groups and independent travellers. Honest total prices, Apple Pay and Google Pay, a real person on WhatsApp. Flights to Africa, the Gulf, Türkiye and the Med.',
   alternates: { canonical: '/' },
 };
 
@@ -37,7 +37,7 @@ export default async function HomePage() {
     name: 'eZAY Travels and Tours Ltd',
     legalName: company.legalName,
     description:
-      'London flight agency for families, groups and independent travellers flying to Africa, the Gulf, Turkey and the Med. Honest prices with our fee shown on the line.',
+      'London flight agency for families, groups and independent travellers. Honest total prices, Apple Pay and Google Pay, a real person on WhatsApp. Flights to Africa, the Gulf, Türkiye and the Med.',
     url: config.siteUrl,
     areaServed: 'GB',
     address: {

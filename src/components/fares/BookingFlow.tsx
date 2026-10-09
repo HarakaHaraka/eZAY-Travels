@@ -24,7 +24,6 @@ export function BookingFlow({
   passengerCount,
   flightTotalMinor,
   currency,
-  breakdown,
   stays,
   insurance,
 }: {
@@ -32,7 +31,6 @@ export function BookingFlow({
   passengerCount: number;
   flightTotalMinor: number;
   currency: string;
-  breakdown: string;
   stays: StayOption[];
   insurance: { description: string; sellMinor: number };
 }) {
@@ -317,7 +315,6 @@ export function BookingFlow({
               </span>
               <span>{formatMoney(flightTotalMinor, currency)}</span>
             </div>
-            <div className="brk" style={{ fontSize: 12 }}>{breakdown}</div>
             {selectedStay && (
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
                 <span className="text-muted">{selectedStay.name}</span>
@@ -346,11 +343,8 @@ export function BookingFlow({
           )}
 
           <button type="submit" className="btn btn-primary btn-block" disabled={submitting}>
-            {submitting ? 'Taking you to payment…' : 'Pay securely'}
+            {submitting ? 'One moment…' : 'Continue to payment'}
           </button>
-          <p className="text-muted" style={{ fontSize: 12, textAlign: 'center', marginTop: 8 }}>
-            Payment is handled on our provider&rsquo;s hosted page. We never see your card details.
-          </p>
         </div>
       </aside>
     </form>

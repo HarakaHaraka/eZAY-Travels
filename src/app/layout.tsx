@@ -27,24 +27,24 @@ const figtree = Figtree({
 export const metadata: Metadata = {
   metadataBase: new URL(config.siteUrl),
   title: {
-    default: 'eZAY Travels — checked across three sources, fee on the line',
+    default: 'eZAY Travels — flights to Africa, the Gulf, Türkiye and the Med, booked in a tap',
     template: '%s · eZAY Travels',
   },
   description:
-    'London flight agency for families, groups and independent travellers flying to Africa, the Gulf, Turkey and the Med. Honest prices, our fee printed on the line, a reply within the hour.',
+    'London flight agency for families, groups and independent travellers. Honest total prices, Apple Pay and Google Pay, a real person on WhatsApp. Flights to Africa, the Gulf, Türkiye and the Med.',
   openGraph: {
     type: 'website',
     siteName: 'eZAY Travels and Tours',
     locale: 'en_GB',
     url: config.siteUrl,
-    title: 'eZAY Travels — checked across three sources, fee on the line',
+    title: 'eZAY Travels — flights to Africa, the Gulf, Türkiye and the Med, booked in a tap',
     description:
-      'Every fare checked across three sources, our fee printed on the line. Quote back within four working hours.',
+      'London flight agency for families, groups and independent travellers. Honest total prices, Apple Pay and Google Pay, a real person on WhatsApp. Flights to Africa, the Gulf, Türkiye and the Med.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'eZAY Travels — checked across three sources, fee on the line',
-    description: 'Every fare checked across three sources, our fee printed on the line.',
+    title: 'eZAY Travels — flights to Africa, the Gulf, Türkiye and the Med, booked in a tap',
+    description: 'Honest total prices, pay in a tap, a real person on WhatsApp.',
   },
   robots: { index: true, follow: true },
 };
