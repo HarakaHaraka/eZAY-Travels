@@ -100,6 +100,33 @@ export default function TermsPage() {
         </section>
 
         <section>
+          <h2>What our insurance requires us to tell you</h2>
+          <p>
+            Our insurers set conditions on the cover, and two of them affect you directly, so we
+            state them here rather than bury them:
+          </p>
+          <ul>
+            <li>
+              <strong>Anything not in your booked itinerary is at your own risk.</strong> Trips,
+              tours, excursions and activities you arrange yourself at the destination are not part
+              of what we have sold you and are not covered by our insurance.
+            </li>
+            <li>
+              <strong>Destinations the Foreign Office advises against.</strong> If any part of your
+              trip goes to a country or region where the FCDO advises against travel, we must refer
+              it to our insurers before we book it. That can take a day or two and we may not be
+              able to proceed. Tell us early if this might apply, and always check
+              gov.uk/foreign-travel-advice yourself.
+            </li>
+          </ul>
+          <p>
+            We sell flights only, as a disclosed agent for the airline. We are not a tour operator
+            and not the organiser of a package, and we do not contract to carry you, to house you or
+            to supply any other travel service.
+          </p>
+        </section>
+
+        <section>
           <h2>Provision of service</h2>
           <p>
             We quote flights and attach the parts of the trip that belong with them — hotels,
