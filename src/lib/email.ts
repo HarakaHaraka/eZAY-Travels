@@ -17,9 +17,12 @@ export interface SendEmailInput {
 }
 
 /**
- * One interface, three transports, chosen by what is configured:
+ * One interface, four transports, chosen by what is configured:
  *
- *   smtp    — Microsoft 365 (SMTP_HOST/PORT/USER/PASS). The primary.
+ *   graph   — Microsoft 365 via the Graph API (MS_GRAPH_TENANT_ID / CLIENT_ID /
+ *             CLIENT_SECRET). The primary: Microsoft has retired password
+ *             (SMTP AUTH) sending on tenants, and this needs no DNS changes.
+ *   smtp    — SMTP_HOST/PORT/USER/PASS, for a server that still allows it.
  *   resend  — RESEND_API_KEY, as the alternative.
  *   console — neither configured: logs, and writes the message to
  *             .mail-outbox/ so local development can see what would have gone.
@@ -30,6 +33,8 @@ export interface SendEmailInput {
  */
 export async function sendEmail(input: SendEmailInput): Promise<void> {
   switch (config.email.transport) {
+    case 'graph':
+      return sendViaGraph(input);
     case 'smtp':
       return sendViaSmtp(input);
     case 'resend':
@@ -77,6 +82,59 @@ async function sendViaResend(input: SendEmailInput): Promise<void> {
   });
   if (error) {
     throw new Error(`Resend failed: ${error.message ?? JSON.stringify(error)}`);
+  }
+}
+
+/**
+ * Microsoft Graph, app-only (client credentials). The app registration needs
+ * the APPLICATION permission Mail.Send with admin consent; the message is sent
+ * as the mailbox named by EMAIL_FROM (a shared mailbox is fine).
+ */
+async function sendViaGraph(input: SendEmailInput): Promise<void> {
+  const { tenantId, clientId, clientSecret } = config.email.graph;
+  const from = config.email.fromAddress;
+
+  const tokenResponse = await fetch(
+    `https://login.microsoftonline.com/${encodeURIComponent(tenantId)}/oauth2/v2.0/token`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        scope: 'https://graph.microsoft.com/.default',
+        grant_type: 'client_credentials',
+      }),
+    }
+  );
+  if (!tokenResponse.ok) {
+    throw new Error(`Graph sign-in failed: ${tokenResponse.status} ${await tokenResponse.text()}`);
+  }
+  const { access_token: token } = (await tokenResponse.json()) as { access_token: string };
+
+  const sendResponse = await fetch(
+    `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(from)}/sendMail`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: {
+          subject: input.subject,
+          body: { contentType: 'HTML', content: input.html },
+          from: { emailAddress: { address: from, name: company.tradingName } },
+          toRecipients: [{ emailAddress: { address: input.to } }],
+          attachments: input.attachments?.map((a) => ({
+            '@odata.type': '#microsoft.graph.fileAttachment',
+            name: a.filename,
+            contentBytes: a.content.toString('base64'),
+          })),
+        },
+        saveToSentItems: true,
+      }),
+    }
+  );
+  if (!sendResponse.ok) {
+    throw new Error(`Graph send failed: ${sendResponse.status} ${await sendResponse.text()}`);
   }
 }
 

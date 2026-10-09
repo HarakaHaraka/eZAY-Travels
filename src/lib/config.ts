@@ -80,6 +80,9 @@ const stripeKey = clean('STRIPE_SECRET_KEY');
 const smtpHost = clean('SMTP_HOST');
 const smtpPass = clean('SMTP_PASS');
 const resendKey = clean('RESEND_API_KEY');
+const graphTenant = clean('MS_GRAPH_TENANT_ID');
+const graphClient = clean('MS_GRAPH_CLIENT_ID');
+const graphSecret = clean('MS_GRAPH_CLIENT_SECRET');
 
 export const config = {
   isProduction: process.env.NODE_ENV === 'production',
@@ -111,14 +114,18 @@ export const config = {
     /** The address customers see and reply to. Defaults to the company email. */
     fromAddress: clean('EMAIL_FROM') || company.email,
     resendApiKey: resendKey,
+    /** Microsoft Graph app-only sending: no SMTP, no DNS, no password login. */
+    graph: { tenantId: graphTenant, clientId: graphClient, clientSecret: graphSecret },
     notifyEmail: clean('NOTIFY_EMAIL') || company.email,
     /** Which transport is actually usable, in priority order. */
     transport:
-      smtpHost !== '' && smtpPass !== ''
-        ? ('smtp' as const)
-        : resendKey !== ''
-          ? ('resend' as const)
-          : ('console' as const),
+      graphTenant !== '' && graphClient !== '' && graphSecret !== ''
+        ? ('graph' as const)
+        : smtpHost !== '' && smtpPass !== ''
+          ? ('smtp' as const)
+          : resendKey !== ''
+            ? ('resend' as const)
+            : ('console' as const),
   },
 
   markup: {

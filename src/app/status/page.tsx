@@ -74,7 +74,11 @@ export default async function StatusPage() {
     ],
     [
       'Email sending',
-      config.email.transport === 'console' ? 'NOT SENDING — no SMTP or Resend key' : config.email.transport,
+      config.email.transport === 'console'
+        ? 'NOT SENDING — no Microsoft Graph, SMTP or Resend key'
+        : config.email.transport === 'graph'
+          ? 'Microsoft 365 (Graph API) — sending as ' + config.email.fromAddress
+          : config.email.transport,
       config.email.transport !== 'console',
     ],
     ['Site URL', config.siteUrl, true],
