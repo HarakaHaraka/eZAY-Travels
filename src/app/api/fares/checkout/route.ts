@@ -137,7 +137,10 @@ export async function POST(request: Request) {
   });
 
   try {
-    const session = await paymentProvider().createCheckout({
+    // Authorise, do not take. The customer stays on ezaytravels.co.uk and the
+    // money is only captured once Duffel has issued the ticket, in
+    // /api/fares/confirm.
+    const auth = await paymentProvider().createPaymentIntent({
       orderRef: order.reference,
       amountMinor: order.totalMinor,
       currency: order.currency,
@@ -152,12 +155,17 @@ export async function POST(request: Request) {
         amountMinor: order.totalMinor,
         currency: order.currency,
         method: 'stripe',
-        stripeSessionId: session.sessionId,
+        stripePaymentIntent: auth.paymentRef,
         status: 'pending',
       },
     });
 
-    return NextResponse.json({ reference: order.reference, redirectUrl: session.redirectUrl });
+    return NextResponse.json({
+      reference: order.reference,
+      offerId: offer.id,
+      clientSecret: auth.clientSecret,
+      publishableKey: auth.publishableKey,
+    });
   } catch (error) {
     console.error(`Checkout creation failed for ${order.reference}:`, error);
     await prisma.order.update({

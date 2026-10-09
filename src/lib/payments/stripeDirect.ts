@@ -1,8 +1,10 @@
 import { randomUUID } from 'crypto';
 import { config } from '../config';
 import type {
+  AuthorizationState,
   CheckoutOrder,
   CheckoutSession,
+  PaymentAuthorization,
   PaymentEvent,
   PaymentProvider,
   PaymentStatus,
@@ -53,6 +55,80 @@ export class StripeDirectProvider implements PaymentProvider {
     });
 
     return { sessionId: session.id, redirectUrl: session.url! };
+  }
+
+  /**
+   * Authorise, do not take. capture_method 'manual' ring-fences the money on
+   * the customer's card and leaves the intent in requires_capture, so the
+   * booking can be attempted before a penny moves.
+   *
+   * Stripe holds a manual-capture authorisation for about 7 days. We capture
+   * within seconds of the Duffel order, so that window is ample.
+   */
+  async createPaymentIntent(order: CheckoutOrder): Promise<PaymentAuthorization> {
+    if (config.payments.demoMode) {
+      const paymentRef = `pi_demo_${randomUUID()}`;
+      return { paymentRef, clientSecret: `${paymentRef}_secret_demo`, publishableKey: '' };
+    }
+
+    const intent = await stripeClient().paymentIntents.create({
+      amount: order.amountMinor,
+      currency: order.currency.toLowerCase(),
+      capture_method: 'manual',
+      receipt_email: order.customerEmail,
+      description: order.description,
+      metadata: { orderRef: order.orderRef },
+      // Let the Dashboard decide which methods appear (cards, Apple Pay,
+      // Google Pay, Link). Wallets are charged at the underlying card rate.
+      automatic_payment_methods: { enabled: true },
+    });
+
+    if (intent.client_secret === null) {
+      throw new Error('Stripe returned a PaymentIntent with no client secret');
+    }
+
+    return {
+      paymentRef: intent.id,
+      clientSecret: intent.client_secret,
+      publishableKey: config.payments.stripePublishableKey,
+    };
+  }
+
+  async authorizationState(paymentRef: string): Promise<AuthorizationState> {
+    if (config.payments.demoMode) return 'requires_capture';
+
+    const intent = await stripeClient().paymentIntents.retrieve(paymentRef);
+    switch (intent.status) {
+      case 'requires_capture':
+        return 'requires_capture';
+      case 'succeeded':
+        return 'captured';
+      case 'requires_payment_method':
+      case 'requires_confirmation':
+      case 'requires_action':
+      case 'processing':
+        return 'incomplete';
+      default:
+        return 'dead';
+    }
+  }
+
+  async capture(paymentRef: string): Promise<void> {
+    if (config.payments.demoMode) return;
+    await stripeClient().paymentIntents.capture(paymentRef);
+  }
+
+  async cancelAuthorization(paymentRef: string, reason?: string): Promise<void> {
+    if (config.payments.demoMode) return;
+    try {
+      await stripeClient().paymentIntents.cancel(paymentRef, {
+        cancellation_reason: reason === 'abandoned' ? 'abandoned' : 'requested_by_customer',
+      });
+    } catch (error) {
+      // Never let a failed release mask the booking error that caused it.
+      // An uncaptured authorisation expires on its own within about 7 days.
+      console.error(`Could not cancel authorisation ${paymentRef}:`, error);
+    }
   }
 
   async handleWebhook(

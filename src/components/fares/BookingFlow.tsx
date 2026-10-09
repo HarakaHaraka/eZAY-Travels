@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type FormEvent } from 'react';
 import { formatMoney } from '@/lib/money';
+import { PaymentStep, type Authorization } from './PaymentStep';
 
 export interface StayOption {
   supplierStayId: string;
@@ -44,6 +45,9 @@ export function BookingFlow({
   const [wantsInsurance, setWantsInsurance] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /** Set once the card is ready to be authorised, on this page. */
+  const [auth, setAuth] = useState<Authorization | null>(null);
+  const [booked, setBooked] = useState<{ reference: string; warning?: string } | null>(null);
 
   const selectedStay = stays.find((s) => s.supplierStayId === selectedStayId) ?? null;
 
@@ -77,11 +81,48 @@ export function BookingFlow({
       });
       const result = await response.json().catch(() => null);
       if (!response.ok) throw new Error(result?.error ?? 'We could not start checkout.');
-      window.location.href = result.redirectUrl;
+      // Stay on this page. The card is taken by Stripe's own fields, below.
+      setAuth({
+        reference: result.reference,
+        offerId: result.offerId ?? offerId,
+        clientSecret: result.clientSecret,
+        publishableKey: result.publishableKey,
+      });
+      setSubmitting(false);
     } catch (err) {
       setError((err as Error).message);
       setSubmitting(false);
     }
+  }
+
+  if (booked) {
+    return (
+      <section className="card elev-sm" style={{ marginTop: 24 }}>
+        <h2 style={{ fontSize: 22 }}>You&rsquo;re booked.</h2>
+        <p>
+          Your reference is <strong>{booked.reference}</strong>. The e-ticket and confirmation are
+          on their way to {email}.
+        </p>
+        {booked.warning && <p role="alert">{booked.warning}</p>}
+        <p style={{ fontSize: 14 }}>
+          Check the passenger names against the passports now. Name changes after ticketing cost
+          money, and we can fix them free in the first few minutes.
+        </p>
+      </section>
+    );
+  }
+
+  if (auth) {
+    return (
+      <div className="card elev-sm" style={{ marginTop: 24 }}>
+        <PaymentStep
+          auth={auth}
+          amountMinor={totalMinor}
+          currency={currency}
+          onBooked={(reference, warning) => setBooked({ reference, warning })}
+        />
+      </div>
+    );
   }
 
   return (

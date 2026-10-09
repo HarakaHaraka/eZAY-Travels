@@ -9,3 +9,10 @@
  */
 @tailwind components;
 @tailwind utilities;
+
+/* ── payment step (Stripe Payment Element, on our own page) ── */
+.paystep { display: grid; gap: 14px; }
+.paystep h3 { font-size: 20px; margin: 0; }
+.paystep-note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--color-neutral-800, #4a5568); }
+.paystep-error { margin: 0; font-size: 14px; color: #b42318; font-weight: 600; }
+.paystep-fine { margin: 0; font-size: 12px; color: var(--color-neutral-700, #6b7280); }
