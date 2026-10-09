@@ -13,7 +13,7 @@ import { useFareSelection } from './FareSelection';
  * not been verified is a placeholder, so loadHomepage() withholds its price
  * and this renders "Ask us" — the public site never shows an invented number.
  */
-export function DestinationBands({ bands }: { bands: Band[] }) {
+export function DestinationBands({ bands, linkRel = 'noopener' }: { bands: Band[]; linkRel?: string }) {
   const { selectedOfferId, selectOffer } = useFareSelection();
 
   function chooseOffer(id: string) {
@@ -95,7 +95,7 @@ export function DestinationBands({ bands }: { bands: Band[] }) {
                       )}
                       <span className="meta">
                         {stay.bookingUrl ? (
-                          <a className="nm lnk" href={stay.bookingUrl} target="_blank" rel="noopener">
+                          <a className="nm lnk" href={stay.bookingUrl} target="_blank" rel={linkRel}>
                             {stay.name}
                             <span aria-hidden="true"> ↗</span>
                           </a>

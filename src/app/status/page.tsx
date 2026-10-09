@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { accreditationClaim, canSellFlights } from '@/lib/accreditation';
+import { affiliateEnabled } from '@/lib/affiliate';
 import { BUILD_MARKER } from '@/lib/buildMarker';
 import { company, config } from '@/lib/config';
 import { paymentProvider } from '@/lib/payments';
@@ -80,6 +81,13 @@ export default async function StatusPage() {
           ? 'Microsoft 365 (Graph API) — sending as ' + config.email.fromAddress
           : config.email.transport,
       config.email.transport !== 'console',
+    ],
+    [
+      'Hotel affiliate links',
+      affiliateEnabled()
+        ? 'ON — hotel links carry the partner tag and the disclosure shows'
+        : 'OFF — plain links, no commission. Add AFFILIATE_LINK_TEMPLATE in Render.',
+      affiliateEnabled(),
     ],
     ['Site URL', config.siteUrl, true],
   ];

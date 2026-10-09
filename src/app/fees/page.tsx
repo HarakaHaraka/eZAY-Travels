@@ -153,6 +153,16 @@ export default function FeesPage() {
         </section>
 
         <section>
+          <h2>Hotel links</h2>
+          <p>
+            We sell flights only and take no payment for accommodation. The hotels we show are
+            linked to booking sites; where we have joined that site&rsquo;s partner programme, it
+            may pay eZAY a small commission on a completed stay. The price you pay is identical
+            either way, and we only list places we would stay ourselves.
+          </p>
+        </section>
+
+        <section>
           <h2>Not included, deliberately</h2>
           <p>
             We don&rsquo;t sell hotels, transfers, car hire or packages, and we don&rsquo;t take

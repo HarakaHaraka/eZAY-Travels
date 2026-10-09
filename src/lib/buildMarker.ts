@@ -9,4 +9,4 @@
  * only export a known set of fields (default, metadata, dynamic, revalidate
  * and friends); any other export fails the production build.
  */
-export const BUILD_MARKER = '2026-10-09-graph-mail';
+export const BUILD_MARKER = '2026-10-09-affiliate-links';

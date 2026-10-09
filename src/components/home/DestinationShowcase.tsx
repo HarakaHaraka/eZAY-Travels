@@ -24,7 +24,17 @@ import { useFareSelection } from './FareSelection';
  */
 const ROTATE_MS = 5000;
 
-export function DestinationShowcase({ bands }: { bands: Band[] }) {
+export function DestinationShowcase({
+  bands,
+  linkRel = 'noopener',
+  stayNote,
+}: {
+  bands: Band[];
+  /** 'sponsored noopener' once hotel links carry an affiliate tag. */
+  linkRel?: string;
+  /** Replaces the default accommodation note, e.g. the affiliate disclosure. */
+  stayNote?: string;
+}) {
   const { selectedOfferId, selectOffer } = useFareSelection();
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -166,7 +176,7 @@ export function DestinationShowcase({ bands }: { bands: Band[] }) {
                     />
                     <span className="meta">
                       {stay.bookingUrl ? (
-                        <a className="nm lnk" href={stay.bookingUrl} target="_blank" rel="noopener">
+                        <a className="nm lnk" href={stay.bookingUrl} target="_blank" rel={linkRel}>
                           {stay.name}
                           <span aria-hidden="true"> ↗</span>
                         </a>
@@ -182,9 +192,8 @@ export function DestinationShowcase({ bands }: { bands: Band[] }) {
                 ))}
               </div>
               <p className="note" style={{ marginTop: 10, fontSize: 12 }}>
-                We do not sell accommodation and take no payment for it — these are places we rate,
-                linked straight to the hotel. Book them yourself, and we will time the flights
-                around them.
+                {stayNote ??
+                  'We do not sell accommodation and take no payment for it — these are places we rate, linked straight to the hotel. Book them yourself, and we will time the flights around them.'}
               </p>
             </div>
 
