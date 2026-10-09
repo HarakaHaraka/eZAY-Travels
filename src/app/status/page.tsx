@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { accreditationClaim, canSellFlights } from '@/lib/accreditation';
+import { BUILD_MARKER } from '@/lib/buildMarker';
 import { company, config } from '@/lib/config';
 
 /**
@@ -20,9 +21,6 @@ export const metadata: Metadata = {
   title: 'Site status',
   robots: { index: false, follow: false },
 };
-
-/** Bumped by hand whenever something visible ships, so a stale deploy is obvious. */
-export const BUILD_MARKER = '2026-10-09-credibility-citybreaks-nearest-airport';
 
 export default function StatusPage() {
   const claim = accreditationClaim();
