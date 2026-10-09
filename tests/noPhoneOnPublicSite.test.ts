@@ -9,6 +9,8 @@ import { describe, expect, it } from 'vitest';
  * was the owner's personal mobile, arriving through a config fallback, so this
  * is enforced mechanically rather than by memory: no public page or component
  * may read config.contact.phone, interpolate a phone prop, or emit a tel: link.
+ * The one exception is the header's "Call us" button, which dials the BUSINESS
+ * line and is built from the WhatsApp number alone — pinned by its own test.
  *
  * The admin area and the booking form are exempt: the admin is behind a login,
  * and the booking form COLLECTS the customer's number rather than showing ours.
@@ -52,6 +54,7 @@ describe('no phone number on the public site', () => {
     for (const file of files) {
       const body = await readFile(file, 'utf8');
       for (const [name, pattern] of BANNED) {
+        if (name === 'a tel: link' && file.endsWith(path.join('home', 'SiteHeader.tsx'))) continue;
         if (pattern.test(body)) {
           offenders.push(`${path.relative(process.cwd(), file)} uses ${name}`);
         }
@@ -75,5 +78,11 @@ describe('no itemised fee beside a booking control', () => {
     // CLAUDE.md rule 5: the price shown is the total; the fee is published on
     // /fees, never itemised next to a Book or Pay button.
     expect(offenders).toEqual([]);
+  });
+
+  it('the header Call button dials the WhatsApp business line, nothing else', async () => {
+    const header = await readFile(path.join(SRC, 'components', 'home', 'SiteHeader.tsx'), 'utf8');
+    expect(header).toMatch(/tel:\+\$\{whatsappNumber/);
+    expect(header).not.toMatch(/contact\.phone|company\.phone|07943|7943569024/);
   });
 });

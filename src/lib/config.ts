@@ -128,6 +128,13 @@ export const config = {
             : ('console' as const),
   },
 
+  /** Social handles. Blank ⇒ the follow buttons are not rendered. */
+  social: {
+    instagram: clean('SOCIAL_INSTAGRAM'),
+    tiktok: clean('SOCIAL_TIKTOK'),
+    facebook: clean('SOCIAL_FACEBOOK'),
+  },
+
   affiliate: {
     /** Network tracking link with `{url}` where the hotel's page goes. Blank ⇒ plain links. */
     linkTemplate: clean('AFFILIATE_LINK_TEMPLATE'),

@@ -45,12 +45,19 @@ export interface AroundRow {
 export interface Scene {
   slug: string;
   chip: string;
+  /** Empty when the scene has no licensed photograph yet; `wash` is used instead. */
   image: string;
+  wash?: string;
   credit: string | null;
   kicker: string;
   headline: string;
   sub: string;
   offerId: string | null;
+  /** Where one click on the hero goes: the guide page, or a quote link. */
+  href: string;
+  external: boolean;
+  /** Up to two places to stay, linked out (affiliate-wrapped when enabled). */
+  stays: Array<{ name: string; url: string }>;
 }
 
 export interface Band {
@@ -101,11 +108,17 @@ export async function loadHomepage(): Promise<HomepageData> {
     const guideOffers = (guide.featuredOffers as unknown as OfferCard[] | null) ?? [];
     for (const offer of guideOffers) offers[offer.id] = offer;
 
+    const cityHotelsForScene = hotels.filter((h) => h.city === guide.city && h.bookingUrl);
     scenes.push({
       slug: guide.slug,
       chip: guide.chipLabel ?? guide.city,
       image: toPublicImagePath(guide.heroImage),
       credit: creditLine(guide.imageCredit, guide.imageLicence),
+      href: `/guides/${guide.slug}`,
+      external: false,
+      stays: cityHotelsForScene
+        .slice(0, 2)
+        .map((h) => ({ name: h.name, url: affiliateLink(h.bookingUrl as string) })),
       kicker: guide.heroKicker ?? '',
       headline: guide.heroHeadline ?? guide.title,
       sub: guide.heroSub ?? '',

@@ -1,6 +1,16 @@
 import Link from 'next/link';
 
+/**
+ * Same header on every screen size. The nav stays visible on a phone (it
+ * scrolls sideways if it must) instead of disappearing, and the action button
+ * is the phone line, not WhatsApp — the floating bubble already covers chat.
+ * The number itself is never printed; the link carries it.
+ */
 export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
+  // The business line IS the WhatsApp line. Built from that value only, so the
+  // personal-mobile config fallback can never reach this link (see
+  // tests/noPhoneOnPublicSite.test.ts).
+  const tel = `tel:+${whatsappNumber.replace(/\D/g, '')}`;
   return (
     <header className="hdr">
       <Link className="lock" href="/#top">
@@ -23,18 +33,13 @@ export function SiteHeader({ whatsappNumber }: { whatsappNumber: string }) {
         <span className="word">eZAY</span>
       </Link>
       <nav>
-        <Link href="/#destinations">Destinations</Link>
+        <Link href="/#top">Destinations</Link>
         <Link href="/fees">Our fees</Link>
         <Link href="/faq">FAQ</Link>
         <Link href="/#enquiry">Enquire</Link>
       </nav>
-      <a
-        className="btn btn-secondary"
-        href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hi eZAY — ')}`}
-        target="_blank"
-        rel="noopener"
-      >
-        WhatsApp us
+      <a className="btn btn-secondary" href={tel}>
+        Call us
       </a>
     </header>
   );
