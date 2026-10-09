@@ -6,6 +6,7 @@ import { flightGateway } from '@/lib/duffel';
 import { formatMoney } from '@/lib/money';
 import { insuranceQuote, priceOffer, priceStay } from '@/lib/offers';
 import { createOrder, type OrderItemInput } from '@/lib/orders';
+import { payUrl } from '@/lib/payLink';
 import { paymentProvider } from '@/lib/payments';
 
 const checkoutSchema = z.object({
@@ -182,6 +183,7 @@ export async function POST(request: Request) {
       offerId: offer.id,
       clientSecret: auth.clientSecret,
       publishableKey: auth.publishableKey,
+      payUrl: payUrl(order.reference),
     });
   } catch (error) {
     console.error(`Checkout creation failed for ${order.reference}:`, error);

@@ -90,3 +90,33 @@ describe('wallet payments take the same protected path', () => {
     expect(component).toContain('availablePaymentMethods');
   });
 });
+
+describe('the finish-on-another-device link', () => {
+  it('is signed, so order references cannot be walked', async () => {
+    const { payToken, verifyPayToken } = await import('@/lib/payLink');
+    const good = payToken('EZY-123456');
+
+    expect(verifyPayToken('EZY-123456', good)).toBe(true);
+    expect(verifyPayToken('EZY-123457', good), 'a token must not work on another order').toBe(false);
+    expect(verifyPayToken('EZY-123456', undefined)).toBe(false);
+    expect(verifyPayToken('EZY-123456', 'not-the-token')).toBe(false);
+    expect(good.length).toBe(32);
+  });
+
+  it('is refused outright by the page when the token is wrong', async () => {
+    const page = await readFile(
+      path.join(process.cwd(), 'src', 'app', 'book', 'pay', '[reference]', 'page.tsx'),
+      'utf8'
+    );
+    expect(page).toContain('verifyPayToken');
+    expect(page).toContain('notFound()');
+  });
+
+  it('will not reopen a payment screen for a booking already ticketed', async () => {
+    const page = await readFile(
+      path.join(process.cwd(), 'src', 'app', 'book', 'pay', '[reference]', 'page.tsx'),
+      'utf8'
+    );
+    expect(page).toContain('if (order.supplierRef)');
+  });
+});

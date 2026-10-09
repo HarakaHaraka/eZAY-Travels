@@ -91,6 +91,7 @@ export function BookingFlow({
         offerId: result.offerId ?? offerId,
         clientSecret: result.clientSecret,
         publishableKey: result.publishableKey,
+        payUrl: result.payUrl,
       });
       setSubmitting(false);
     } catch (err) {
