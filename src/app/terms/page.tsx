@@ -45,7 +45,7 @@ export default function TermsPage() {
             <li>
               Email: <a href={`mailto:${config.contact.email}`}>{config.contact.email}</a>
             </li>
-            <li>Phone: {config.contact.phone}</li>
+            <li>WhatsApp: via the button on every page.</li>
           </ul>
         </section>
 

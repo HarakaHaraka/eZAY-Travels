@@ -78,9 +78,7 @@ export default function AboutPage() {
           <ul>
             <li>A written quote within four working hours, usually within the hour on WhatsApp.</li>
             <li>No hidden extras. Bags, seats and card fees are shown before you pay, not after.</li>
-            <li>
-              A person who answers. {company.phone} and WhatsApp, 8am to 10pm, seven days a week.
-            </li>
+            <li>A person who answers, on WhatsApp and email, 8am to 10pm, seven days a week.</li>
           </ul>
         </section>
 
