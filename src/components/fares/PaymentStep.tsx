@@ -1,26 +1,39 @@
 'use client';
 
-import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import {
+  Elements,
+  ExpressCheckoutElement,
+  PaymentElement,
+  useElements,
+  useStripe,
+} from '@stripe/react-stripe-js';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { useMemo, useState } from 'react';
 import { formatMoney } from '@/lib/money';
 
 /**
- * Payment, on eZAY's own page.
+ * Payment, on eZAY's own page, wallet-first.
  *
- * The card fields are Stripe's Payment Element — Stripe-hosted iframes mounted
- * inside this page. The customer never leaves ezaytravels.co.uk, and no card
- * detail ever reaches an eZAY server or this component's state.
+ * Apple Pay, Google Pay and Link render as full-width buttons ABOVE the card
+ * form, because the point of eZAY is that a traveller goes from a social post
+ * to a booked seat without typing a card number. A wallet tap is one
+ * fingerprint; a card is sixteen digits, an expiry, a CVC and usually a
+ * 3-D Secure screen. The card form stays underneath for everyone else.
  *
- * The order of operations is the whole point:
+ * Both routes end in exactly the same place, because the money order is what
+ * protects the customer:
  *
- *   confirmPayment() authorises the card and takes NOTHING, because the
- *   PaymentIntent was created with capture_method 'manual'. Only then do we
- *   call /api/fares/confirm, which books the ticket with Duffel and captures
- *   the money if, and only if, the ticket was issued.
+ *   confirmPayment() AUTHORISES and takes nothing — the PaymentIntent was
+ *   created with capture_method 'manual'. Only then does finishBooking() call
+ *   /api/fares/confirm, which issues the ticket with Duffel and captures the
+ *   money if, and only if, the ticket exists.
  *
- * redirect: 'if_required' keeps the customer here for ordinary cards and
- * hands them to their bank only when 3-D Secure actually demands it.
+ * Card fields are Stripe's own iframes. No card detail reaches this component
+ * or any eZAY server.
+ *
+ * Wallets only appear on a registered domain over HTTPS: Apple Pay on Safari
+ * with a card in Wallet, Google Pay on Chrome or Android. Where none is
+ * available the express block hides itself rather than leaving a gap.
  */
 
 let stripePromise: Promise<Stripe | null> | null = null;
@@ -62,6 +75,8 @@ export function PaymentStep({
   );
 }
 
+type Stage = 'idle' | 'authorising' | 'booking';
+
 function PayForm({
   auth,
   amountMinor,
@@ -77,17 +92,48 @@ function PayForm({
   const elements = useElements();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [stage, setStage] = useState<'idle' | 'authorising' | 'booking'>('idle');
+  const [stage, setStage] = useState<Stage>('idle');
+  const [hasWallets, setHasWallets] = useState(false);
 
-  async function handlePay(event: React.FormEvent) {
-    event.preventDefault();
-    if (!stripe || !elements || busy) return;
+  function fail(message: string) {
+    setBusy(false);
+    setStage('idle');
+    setError(message);
+  }
 
+  /**
+   * Steps 2 and 3, server-side: book the ticket, then take the money.
+   * Shared by the wallet and the card route — there is one money path, not two.
+   */
+  async function finishBooking() {
+    setStage('booking');
+    try {
+      const response = await fetch('/api/fares/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderRef: auth.reference, offerId: auth.offerId }),
+      });
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        fail(result?.error ?? 'We could not complete that booking. Nothing has been charged.');
+        return;
+      }
+      onBooked(result?.reference ?? auth.reference, result?.warning);
+    } catch {
+      fail(
+        `We lost the connection while confirming. Do not pay again — WhatsApp us with reference ${auth.reference} and we will tell you exactly where it got to.`
+      );
+    }
+  }
+
+  /** Step 1, shared: authorise the card or wallet. Nothing is taken here. */
+  async function authoriseThenBook() {
+    if (!stripe || !elements) return;
     setBusy(true);
     setError(null);
     setStage('authorising');
 
-    // Step 1: authorise. Nothing is taken from the card here.
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       redirect: 'if_required',
@@ -97,52 +143,48 @@ function PayForm({
     });
 
     if (stripeError) {
-      setBusy(false);
-      setStage('idle');
-      setError(
+      fail(
         stripeError.message ??
-          'That card was not accepted. Nothing has been taken — please try another card.'
+          'That payment was not accepted. Nothing has been taken — please try again.'
       );
       return;
     }
 
-    // Step 2 and 3: book the ticket, then capture. Server-side.
-    setStage('booking');
-    try {
-      const response = await fetch('/api/fares/confirm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderRef: auth.reference, offerId: auth.offerId }),
-      });
-      const result = await response.json();
-
-      if (!response.ok) {
-        setBusy(false);
-        setStage('idle');
-        setError(result?.error ?? 'We could not complete that booking. Nothing has been charged.');
-        return;
-      }
-
-      onBooked(result.reference ?? auth.reference, result.warning);
-    } catch {
-      setBusy(false);
-      setStage('idle');
-      setError(
-        'We lost the connection while confirming. Do not pay again — WhatsApp us with reference ' +
-          auth.reference +
-          ' and we will tell you exactly where it got to.'
-      );
-    }
+    await finishBooking();
   }
 
   return (
-    <form onSubmit={handlePay} className="paystep">
+    <form
+      className="paystep"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!busy) void authoriseThenBook();
+      }}
+    >
       <h3>Payment</h3>
       <p className="paystep-note">
         We hold the amount on your card, book the seat with the airline, and only then take the
         payment. If the airline will not confirm it, the hold is released and you are charged
         nothing.
       </p>
+
+      {/* One tap: Apple Pay, Google Pay, Link. */}
+      <div className={hasWallets ? 'paystep-express' : 'paystep-express is-empty'}>
+        <ExpressCheckoutElement
+          options={{ buttonTheme: { applePay: 'black', googlePay: 'black' }, buttonHeight: 48 }}
+          onReady={({ availablePaymentMethods }) => {
+            setHasWallets(Boolean(availablePaymentMethods));
+          }}
+          onConfirm={() => {
+            if (!busy) void authoriseThenBook();
+          }}
+        />
+        {hasWallets && (
+          <div className="paystep-or">
+            <span>or pay by card</span>
+          </div>
+        )}
+      </div>
 
       <PaymentElement options={{ layout: 'tabs' }} />
 

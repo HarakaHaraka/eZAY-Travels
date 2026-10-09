@@ -10,7 +10,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── payment step (Stripe Payment Element, on our own page) ── */
+/* ── payment step (Stripe Elements, on our own page) ── */
+.paystep-express { display: grid; gap: 12px; }
+.paystep-express.is-empty { display: none; }
+.paystep-or { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--color-neutral-700, #6b7280); }
+.paystep-or::before, .paystep-or::after { content: ''; flex: 1; height: 1px; background: var(--color-neutral-200, #e6e9ee); }
+
 .paystep { display: grid; gap: 14px; }
 .paystep h3 { font-size: 20px; margin: 0; }
 .paystep-note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--color-neutral-800, #4a5568); }
