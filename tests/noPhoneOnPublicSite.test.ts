@@ -61,3 +61,19 @@ describe('no phone number on the public site', () => {
     expect(offenders).toEqual([]);
   });
 });
+
+describe('no itemised fee beside a booking control', () => {
+  it('no public page or component renders offer.breakdown', async () => {
+    const files = await sourceFiles(SRC);
+    const offenders: string[] = [];
+    for (const file of files) {
+      const body = await readFile(file, 'utf8');
+      if (/\{offer\.breakdown\}|\{breakdown\}/.test(body)) {
+        offenders.push(path.relative(process.cwd(), file));
+      }
+    }
+    // CLAUDE.md rule 5: the price shown is the total; the fee is published on
+    // /fees, never itemised next to a Book or Pay button.
+    expect(offenders).toEqual([]);
+  });
+});

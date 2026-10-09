@@ -8,7 +8,7 @@ import { company, config } from '@/lib/config';
 export const metadata: Metadata = {
   title: 'About eZAY Travels',
   description:
-    'A London flight agency run by one named person. Somali, Swahili, Arabic and Italian spoken. Honest prices, our fee on the line, a reply within the hour.',
+    'A London flight agency run by one named person. Somali, Swahili, Arabic and Italian spoken. Honest total prices, pay in a tap, a reply within the hour.',
   alternates: { canonical: '/about' },
 };
 
@@ -66,10 +66,10 @@ export default function AboutPage() {
         <section>
           <h2>How we price</h2>
           <p>
-            We check your route across the live airline feed and our trade fares, then quote you one
-            price with our service fee printed as its own line. The fee is fixed per booking and
-            published on <Link href="/fees">our fees page</Link>. If you can show us the same flight
-            cheaper elsewhere, we&rsquo;ll tell you honestly whether we can match it.
+            We check your route across the live airline feed and our trade fares, then show you one
+            total price with our service fee already inside it. How the fee is worked out is
+            published in full on <Link href="/fees">our fees page</Link>. If you can show us the
+            same flight cheaper elsewhere, we&rsquo;ll tell you honestly whether we can match it.
           </p>
         </section>
 

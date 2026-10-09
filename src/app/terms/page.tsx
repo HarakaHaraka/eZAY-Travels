@@ -94,7 +94,7 @@ export default function TermsPage() {
             </li>
             <li>
               <strong>Our ticketing partner.</strong> Ticketed and issued through an accredited
-              partner. We tell you which fare we used and what our fee was.
+              partner where that gives you a better price.
             </li>
           </ul>
         </section>
@@ -129,11 +129,10 @@ export default function TermsPage() {
         <section>
           <h2>Provision of service</h2>
           <p>
-            We quote flights and attach the parts of the trip that belong with them — hotels,
-            airport transfers, insurance and add-ons — and present a single price with our fee shown
-            on the line. Prices shown on the site are examples; your quote is priced to your dates
-            and confirmed in writing before you pay. A confirmation document with your booking
-            reference follows every completed order.
+            We sell flights, and point you to good places to stay and reliable ways to get around
+            without taking payment for them. The price you see is the total you pay, with our service
+            fee already included; the fee itself is published on our <Link href="/fees">fees page</Link>.
+            A confirmation document with your booking reference follows every completed order.
           </p>
         </section>
 
@@ -170,7 +169,7 @@ export default function TermsPage() {
             <li>
               <strong>Privacy &amp; data.</strong> We use your details only to quote, book and
               support your trip, and to contact you about it. We don&rsquo;t sell your data. Card
-              details are handled by our payment provider&rsquo;s hosted checkout — we never see or
+              details are entered into Stripe&rsquo;s own secure fields on our page — we never see or
               store them.
             </li>
             <li>

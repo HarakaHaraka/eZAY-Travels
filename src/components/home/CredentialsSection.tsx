@@ -47,7 +47,7 @@ export function CredentialsSection() {
     ],
     ['Flight content', 'Duffel — live; easyJet, BA, Turkish, Qatar, Emirates, EgyptAir and 40 more', true],
     ['Trade net fares', 'Faremine and Major Travel trade accounts — applications in', false],
-    ['Payments', 'Stripe hosted checkout — card details never touch our systems', true],
+    ['Payments', 'Stripe — Apple Pay, Google Pay and cards, on our own page; card details never touch our systems', true],
     ['A person answers', 'Quote back within four working hours, every enquiry', true],
   ];
 

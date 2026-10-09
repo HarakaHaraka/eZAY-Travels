@@ -68,7 +68,6 @@ export default async function OfferDetailPage({
           passengerCount={offer.passengerCount}
           flightTotalMinor={offer.totalMinor}
           currency={offer.currency}
-          breakdown={offer.breakdown}
           stays={stays.map((stay) => ({
             supplierStayId: stay.supplierStayId,
             name: stay.name,

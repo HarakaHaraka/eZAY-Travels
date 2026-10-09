@@ -42,7 +42,7 @@ export function GET() {
         : 'LIVE — real fares',
       payments: config.payments.demoMode
         ? 'DEMO — no STRIPE_SECRET_KEY set, checkout uses the in-app demo page'
-        : 'LIVE — Stripe hosted checkout',
+        : 'LIVE — Stripe, on our own page',
       email: config.email.transport,
       siteUrl: config.siteUrl,
     },
