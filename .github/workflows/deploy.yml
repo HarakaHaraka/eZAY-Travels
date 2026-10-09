@@ -27,8 +27,11 @@ jobs:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
           if [ -z "$HOOK" ]; then
-            echo "::error::RENDER_DEPLOY_HOOK_URL secret is not set, so nothing was deployed."
-            exit 1
+            # Not a failure: the owner deploys from the Render dashboard until the
+            # hook secret is added. A red run on every merge only trains people to
+            # ignore the emails that matter.
+            echo "::notice::RENDER_DEPLOY_HOOK_URL secret is not set. Skipping — deploy from the Render dashboard, or add the secret to make this automatic."
+            exit 0
           fi
           code=$(curl -sS -o response.txt -w '%{http_code}' "$HOOK")
           echo "Render responded with HTTP $code"
