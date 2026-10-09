@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: '%s · eZAY Travels',
   },
   description:
-    'UK travel agency for festival and long-haul independent travellers. Every fare checked across three sources, our fee printed on the line. Quote back within four working hours.',
+    'London flight agency for families, groups and independent travellers flying to Africa, the Gulf, Turkey and the Med. Honest prices, our fee printed on the line, a reply within the hour.',
   openGraph: {
     type: 'website',
     siteName: 'eZAY Travels and Tours',

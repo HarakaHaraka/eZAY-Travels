@@ -1,4 +1,5 @@
-import { accreditationClaim, canSellFlights } from '@/lib/accreditation';
+import { accreditationClaim, canSellFlights, flightOnlyAgentMode } from '@/lib/accreditation';
+import { company } from '@/lib/config';
 
 /**
  * "Where we are, honestly" — the credentials panel.
@@ -14,18 +15,38 @@ export function CredentialsSection() {
   const bookable = canSellFlights();
 
   const rows: Array<[title: string, value: string, done: boolean]> = [
-    ['Registered company', 'eZAY Travels and Tours Ltd — company number to be displayed', false],
+    [
+      'Registered company',
+      `${company.legalName} — company no. ${company.number}, ${company.registeredIn}`,
+      true,
+    ],
     claim === null
-      ? [
-          'Financial protection',
-          'Accreditation and licence number to be confirmed before we take payment',
-          false,
-        ]
+      ? flightOnlyAgentMode()
+        ? [
+            'Financial protection',
+            'Flight-only tickets, issued instantly, sold as agent for the airline. Not ATOL protected — we recommend travel insurance',
+            true,
+          ]
+        : [
+            'Financial protection',
+            'Flight-only tickets sold as agent for the airline. Not ATOL protected — we recommend travel insurance',
+            false,
+          ]
       : ['Financial protection', `${claim.holderName} — ${claim.number}`, true],
-    ['Professional indemnity', 'Cover being arranged — certificate to be displayed', false],
-    ['Data protection', 'ICO registration in progress', false],
-    ['Flight content', 'Duffel — integration in test', false],
-    ['Long-haul net fares', 'Faremine trade account — application submitted', false],
+    [
+      'Insurance',
+      'Professional indemnity and public liability in force from 7 October 2026 (Campbell Irvine)',
+      true,
+    ],
+    [
+      'Data protection',
+      company.icoReference
+        ? `ICO registration ${company.icoReference}`
+        : 'ICO registration in progress — privacy notice published',
+      company.icoReference !== '',
+    ],
+    ['Flight content', 'Duffel — live; easyJet, BA, Turkish, Qatar, Emirates, EgyptAir and 40 more', true],
+    ['Trade net fares', 'Faremine and Major Travel trade accounts — applications in', false],
     ['Payments', 'Stripe hosted checkout — card details never touch our systems', true],
     ['A person answers', 'Quote back within four working hours, every enquiry', true],
   ];

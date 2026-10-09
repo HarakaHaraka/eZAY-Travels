@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { SiteHeader } from '@/components/home/SiteHeader';
+import { SiteFooter } from '@/components/site/SiteFooter';
 import { WhatsAppBubble } from '@/components/home/WhatsAppBubble';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
@@ -173,9 +174,7 @@ export default async function GuidePage({ params }: { params: { slug: string } }
         </div>
       </section>
 
-      <footer>
-        Last updated {guide.updatedAt.toLocaleDateString('en-GB')} · eZAY Travels and Tours Ltd
-      </footer>
+      <SiteFooter />
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}

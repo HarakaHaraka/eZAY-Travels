@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { SiteHeader } from '@/components/home/SiteHeader';
+import { SiteFooter } from '@/components/site/SiteFooter';
 import { WhatsAppBubble } from '@/components/home/WhatsAppBubble';
 import { config } from '@/lib/config';
 import { prisma } from '@/lib/db';
@@ -101,7 +102,7 @@ export default async function GuidesIndex() {
         </div>
       </div>
 
-      <footer>eZAY Travels and Tours Ltd · London</footer>
+      <SiteFooter />
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}

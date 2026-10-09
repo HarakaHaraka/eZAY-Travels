@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { SiteHeader } from '@/components/home/SiteHeader';
-import { config } from '@/lib/config';
+import { company, config } from '@/lib/config';
+import { SiteFooter } from '@/components/site/SiteFooter';
 
 export const metadata: Metadata = {
   title: 'Terms, policies & company information — eZAY Travels',
@@ -40,7 +41,7 @@ export default function TermsPage() {
           </p>
           <ul>
             <li>Registered office: 181 Barcombe Avenue, London SW2 3BH.</li>
-            <li>Contact: Zay Siyad</li>
+            <li>Director: {company.director}</li>
             <li>
               Email: <a href={`mailto:${config.contact.email}`}>{config.contact.email}</a>
             </li>
@@ -53,17 +54,25 @@ export default function TermsPage() {
           <ul>
             <li>Registered company: EZAY TRAVELS AND TOURS LTD, no. 17394853 (England &amp; Wales).</li>
             <li>
-              Registered with the Information Commissioner&rsquo;s Office (ICO) for data protection
-              — registration number available on request.
+              Data protection: our{' '}
+              <a href="/terms/privacy-notice.html">privacy notice</a> sets out what we collect and
+              why. ICO registration{' '}
+              {company.icoReference ? `reference ${company.icoReference}.` : 'is in progress.'}
             </li>
-            <li>Public liability insurance: in place.</li>
-            <li>Employers&rsquo; liability insurance: in place.</li>
-            <li>Professional indemnity &amp; identity cover: in place.</li>
+            <li>
+              Professional indemnity and public liability insurance: in force from 7 October 2026,
+              arranged through Campbell Irvine (Insurance Brokers) Ltd.
+            </li>
+            <li>
+              Employers&rsquo; liability insurance: not held, because the company has no employees.
+              It will be added before anyone is employed.
+            </li>
           </ul>
           <p>
-            Air Travel Organiser&rsquo;s Licence (ATOL): being arranged. Until it is confirmed we
-            make no flight-protection claim and do not sell flights for instant online payment —
-            flights are handled as a written enquiry, which is the current path to book.
+            We sell flight-only tickets as a disclosed agent for the airline. Tickets are issued
+            immediately on payment, so they fall outside the ATOL scheme and are{' '}
+            <strong>not ATOL protected</strong>. We do not sell packages. We recommend travel
+            insurance for every trip, and we say so on every confirmation.
           </p>
         </section>
 
@@ -143,8 +152,12 @@ export default function TermsPage() {
               tell you the change/cancel terms of a specific fare before you commit.
             </li>
             <li>
-              <strong>Cookies.</strong> We keep these to what makes the site work and helps us
-              improve it.
+              <strong>Cookies.</strong> Only the cookies that make the site work. No tracking or
+              advertising. See <Link href="/cookies">cookies</Link>.
+            </li>
+            <li>
+              <strong>Our fees.</strong> A fixed service fee per booking, shown as its own line
+              before you pay. See <Link href="/fees">our fees</Link>.
             </li>
           </ul>
         </section>
@@ -172,10 +185,7 @@ export default function TermsPage() {
         </p>
       </main>
 
-      <footer>
-        EZAY TRAVELS AND TOURS LTD (trading as Ezay Travels) · Company No. 17394853 · 181 Barcombe
-        Avenue, London SW2 3BH
-      </footer>
+      <SiteFooter />
     </>
   );
 }
