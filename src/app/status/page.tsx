@@ -62,8 +62,15 @@ export default async function StatusPage() {
     ],
     [
       'Payments',
-      config.payments.demoMode ? 'DEMO — no Stripe key, in-app demo checkout' : 'LIVE — Stripe checkout',
+      config.payments.demoMode ? 'DEMO — no Stripe key, in-app demo checkout' : 'LIVE — Stripe, on our own page',
       !config.payments.demoMode,
+    ],
+    [
+      'Stripe webhook secret',
+      config.payments.stripeWebhookSecret
+        ? 'Set — refunds and disputes will reach the right order'
+        : 'NOT SET — add STRIPE_WEBHOOK_SECRET in Render (Stripe: Developers, Webhooks, Reveal signing secret)',
+      config.payments.stripeWebhookSecret !== '',
     ],
     [
       'Email sending',
