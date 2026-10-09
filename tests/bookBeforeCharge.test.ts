@@ -59,3 +59,34 @@ describe('the authorisation itself', () => {
     expect(provider).toContain("capture_method: 'manual'");
   });
 });
+
+describe('wallet payments take the same protected path', () => {
+  it('routes Apple Pay and Google Pay through the same authorise-then-book code', async () => {
+    const component = await readFile(
+      path.join(process.cwd(), 'src', 'components', 'fares', 'PaymentStep.tsx'),
+      'utf8'
+    );
+    // One money path, not two: the express button must call the same
+    // function the card button does, so a wallet can never skip the
+    // book-before-capture ordering.
+    expect(component).toContain('ExpressCheckoutElement');
+    expect(component).toContain('onConfirm');
+
+    const handlerCalls = component.match(/authoriseThenBook\(\)/g) ?? [];
+    expect(handlerCalls.length, 'both routes call authoriseThenBook').toBeGreaterThanOrEqual(2);
+
+    // And only one place may actually CALL the confirm endpoint (prose in the
+    // file header mentions it too, which is why this matches the fetch itself).
+    const confirmCalls = component.match(/fetch\(\s*'\/api\/fares\/confirm'/g) ?? [];
+    expect(confirmCalls.length, 'exactly one call site for the confirm route').toBe(1);
+  });
+
+  it('hides the wallet block when the device offers no wallet', async () => {
+    const component = await readFile(
+      path.join(process.cwd(), 'src', 'components', 'fares', 'PaymentStep.tsx'),
+      'utf8'
+    );
+    expect(component).toContain('is-empty');
+    expect(component).toContain('availablePaymentMethods');
+  });
+});
