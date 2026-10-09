@@ -51,6 +51,30 @@ function paymentMode(): PaymentMode {
   return raw;
 }
 
+/**
+ * Public company facts. These are not secrets and are the same on every
+ * environment, so they live here rather than in env — a blank env must never
+ * put a placeholder number or address on the public site.
+ * Source: Companies House, company 17394853, incorporated 12 August 2026.
+ */
+export const company = {
+  legalName: 'eZAY Travels and Tours Ltd',
+  tradingName: 'eZAY Travels',
+  number: '17394853',
+  registeredIn: 'England and Wales',
+  address: '181 Barcombe Avenue, London SW2 3BH',
+  director: 'Zainab Ahmed Husein (known as Zay)',
+  email: clean('COMPANY_EMAIL') || 'manager@ezaytravels.co.uk',
+  phone: clean('COMPANY_PHONE') || '+44 7849 549740',
+  /** Digits only, international format, for wa.me links. */
+  whatsapp: clean('WHATSAPP_NUMBER') || '447849549740',
+  website: 'ezaytravels.co.uk',
+  insurance:
+    'Professional indemnity and public liability insurance arranged through Campbell Irvine (Insurance Brokers) Ltd, in force from 7 October 2026.',
+  /** Blank until the ICO reference arrives; the footer then prints it. */
+  icoReference: clean('ICO_REFERENCE'),
+} as const;
+
 const duffelKey = clean('DUFFEL_API_KEY');
 const stripeKey = clean('STRIPE_SECRET_KEY');
 const smtpHost = clean('SMTP_HOST');
@@ -82,7 +106,7 @@ export const config = {
     smtpUser: clean('SMTP_USER'),
     smtpPass,
     resendApiKey: resendKey,
-    notifyEmail: clean('NOTIFY_EMAIL') || 'coordinator@ezay.co.uk',
+    notifyEmail: clean('NOTIFY_EMAIL') || company.email,
     /** Which transport is actually usable, in priority order. */
     transport:
       smtpHost !== '' && smtpPass !== ''
@@ -102,10 +126,12 @@ export const config = {
   },
 
   contact: {
-    whatsapp: clean('WHATSAPP_NUMBER') || '447000000000',
-    phone: clean('COMPANY_PHONE') || '0794356924',
-    email: clean('NOTIFY_EMAIL') || 'coordinator@ezay.co.uk',
+    whatsapp: clean('WHATSAPP_NUMBER') || company.whatsapp,
+    phone: clean('COMPANY_PHONE') || company.phone,
+    email: clean('NOTIFY_EMAIL') || company.email,
   },
+
+  company,
 
   admin: {
     password: clean('ADMIN_PASSWORD'),

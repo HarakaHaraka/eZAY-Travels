@@ -56,8 +56,24 @@ export function accreditationClaim(): AccreditationClaim | null {
   };
 }
 
-/** A flight-only sale needs a complete claim that covers flight_only. */
+/**
+ * Flight-only agent mode.
+ *
+ * A flight-only ticket that is issued immediately on payment, sold as a
+ * disclosed agent for the airline, is outside the ATOL scheme (it is an
+ * airline ticket sale, not a flight accommodation arrangement). eZAY issues
+ * tickets instantly through Duffel, so this mode lets checkout run with NO
+ * protection claim rendered anywhere. It is off by default and switched on
+ * only by setting FLIGHT_ONLY_AGENT_MODE=true in the environment, in writing.
+ * Packages stay blocked until a real ATOL claim is configured.
+ */
+export function flightOnlyAgentMode(): boolean {
+  return clean('FLIGHT_ONLY_AGENT_MODE').toLowerCase() === 'true';
+}
+
+/** A flight-only sale needs a complete claim that covers flight_only, or agent mode. */
 export function canSellFlights(): boolean {
+  if (flightOnlyAgentMode()) return true;
   const claim = accreditationClaim();
   return claim !== null && claim.scope.includes('flight_only');
 }

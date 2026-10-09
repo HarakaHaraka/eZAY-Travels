@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { EnquiryPanel } from '@/components/home/EnquiryPanel';
 import { SiteHeader } from '@/components/home/SiteHeader';
+import { SiteFooter } from '@/components/site/SiteFooter';
 import { WhatsAppBubble } from '@/components/home/WhatsAppBubble';
 import { flightCheckoutBlockedReason } from '@/lib/accreditation';
 import { config } from '@/lib/config';
@@ -66,10 +67,7 @@ export default function EnquiryPage({
         prefillTrip={prefill}
       />
 
-      <footer>
-        eZAY Travels and Tours Ltd · London · A person answers every enquiry within four working
-        hours.
-      </footer>
+      <SiteFooter />
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}

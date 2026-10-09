@@ -126,3 +126,25 @@ describe('populated config', () => {
     });
   });
 });
+
+describe('flight-only agent mode — the explicit opt-in', () => {
+  it('stays off unless FLIGHT_ONLY_AGENT_MODE is exactly true', () => {
+    process.env.FLIGHT_ONLY_AGENT_MODE = '';
+    expect(canSellFlights()).toBe(false);
+    process.env.FLIGHT_ONLY_AGENT_MODE = 'yes';
+    expect(canSellFlights()).toBe(false);
+  });
+
+  it('enables flight-only checkout with no protection claim and packages still off', () => {
+    process.env.FLIGHT_ONLY_AGENT_MODE = 'true';
+    expect(canSellFlights()).toBe(true);
+    expect(accreditationClaim()).toBeNull();
+    expect(canSellPackages()).toBe(false);
+    expect(flightCheckoutBlockedReason()).toBeNull();
+    expect(protectionSnapshot()).toEqual({
+      protectionHolder: null,
+      protectionNumber: null,
+      protectionStatement: null,
+    });
+  });
+});

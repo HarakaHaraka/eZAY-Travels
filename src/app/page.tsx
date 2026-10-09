@@ -1,11 +1,14 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { DestinationBands } from '@/components/home/DestinationBands';
 import { DestinationPicker } from '@/components/home/DestinationPicker';
 import { EnquiryPanel } from '@/components/home/EnquiryPanel';
 import { FareSelectionProvider } from '@/components/home/FareSelection';
 import { HeroAndFareBar } from '@/components/home/HeroAndFareBar';
 import { SiteHeader } from '@/components/home/SiteHeader';
+import { CityBreaks } from '@/components/home/CityBreaks';
+import { CredentialsSection } from '@/components/home/CredentialsSection';
+import { SiteFooter } from '@/components/site/SiteFooter';
+import { company } from '@/lib/config';
 import { WhatsAppBubble } from '@/components/home/WhatsAppBubble';
 import { canSellFlights } from '@/lib/accreditation';
 import { config } from '@/lib/config';
@@ -21,7 +24,7 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: 'eZAY Travels — checked across three sources, fee on the line',
   description:
-    'UK travel agency for festival and long-haul independent travellers. Every fare checked across three sources, our fee printed on the line. Quote back within four working hours.',
+    'London flight agency for families, groups and independent travellers flying to Africa, the Gulf, Turkey and the Med. Honest prices, our fee printed on the line, a reply within the hour.',
   alternates: { canonical: '/' },
 };
 
@@ -33,13 +36,23 @@ export default async function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'TravelAgency',
     name: 'eZAY Travels and Tours Ltd',
+    legalName: company.legalName,
     description:
-      'UK travel agency for festival travellers and long-haul independent travellers. Every fare checked across three sources, with our fee shown on the line.',
+      'London flight agency for families, groups and independent travellers flying to Africa, the Gulf, Turkey and the Med. Honest prices with our fee shown on the line.',
     url: config.siteUrl,
     areaServed: 'GB',
-    address: { '@type': 'PostalAddress', addressLocality: 'London', addressCountry: 'GB' },
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '181 Barcombe Avenue',
+      addressLocality: 'London',
+      postalCode: 'SW2 3BH',
+      addressCountry: 'GB',
+    },
     telephone: config.contact.phone,
     email: config.contact.email,
+    founder: { '@type': 'Person', name: 'Zainab Ahmed Husein' },
+    knowsLanguage: ['en', 'so', 'sw', 'ar', 'it'],
+    identifier: { '@type': 'PropertyValue', propertyID: 'Companies House', value: company.number },
   };
 
   return (
@@ -58,25 +71,7 @@ export default async function HomePage() {
           flightsBookable={flightsBookable}
         />
 
-        <section className="proof wrap" id="pricing">
-          <div>
-            <h3>3 sources</h3>
-            <p>
-              Every enquiry is checked across all three before we quote. You see which one we used.
-            </p>
-          </div>
-          <div>
-            <h3>4 hours</h3>
-            <p>A written quote back inside four working hours. Not &ldquo;we&rsquo;ll get to it&rdquo;.</p>
-          </div>
-          <div>
-            <h3>One number</h3>
-            <p>
-              Flight, hotel and cover priced together, with our fee on the line where you can see
-              it.
-            </p>
-          </div>
-        </section>
+        <CityBreaks whatsappNumber={config.contact.whatsapp} />
 
         <DestinationPicker bands={bands} />
 
@@ -85,21 +80,9 @@ export default async function HomePage() {
 
       <EnquiryPanel whatsappNumber={config.contact.whatsapp} phone={config.contact.phone} />
 
-      <footer>
-        EZAY TRAVELS AND TOURS LTD (trading as Ezay Travels) · Company No. 17394853 · 181 Barcombe
-        Avenue, London SW2 3BH
-        <br />
-        <Link href="/terms">Terms, policies &amp; company information</Link> · Fares shown are
-        examples — ask us and we&rsquo;ll price your dates properly.
-        <br />
-        <a href="/terms/terms-of-service.html">Terms of Service</a> ·{' '}
-        <a href="/terms/booking-conditions.html">Booking Conditions</a> ·{' '}
-        <a href="/terms/refunds-and-cancellations.html">Refunds &amp; Cancellations</a> ·{' '}
-        <a href="/terms/who-is-responsible.html">Who Is Liable</a> ·{' '}
-        <a href="/terms/right-of-refusal.html">Right of Refusal</a> ·{' '}
-        <a href="/terms/privacy-notice.html">Privacy Notice</a> ·{' '}
-        <a href="/terms/complaints.html">Complaints</a>
-      </footer>
+      <CredentialsSection />
+
+      <SiteFooter />
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}
