@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { config } from '@/lib/config';
-import { searchAirports, type AirportEntry } from '@/lib/airports';
+import { aliasAirports, nearestAirports, searchAirports, type AirportEntry } from '@/lib/airports';
 
 /**
  * Airport/city suggestions for the fare-bar autocomplete.
@@ -20,12 +20,58 @@ interface Place {
   city: string | null;
   country: string | null;
   metro: boolean;
+  /** "Nearest airport to Brescia (45 km)" — set when the typed place has no airport. */
+  note?: string;
 }
 
 const IATA = /^[A-Z]{3}$/;
 
-function fromEntry(a: AirportEntry): Place {
-  return { code: a.code, name: a.name, city: a.city, country: a.country, metro: !!a.metro };
+function fromEntry(a: AirportEntry, note?: string): Place {
+  return { code: a.code, name: a.name, city: a.city, country: a.country, metro: !!a.metro, note };
+}
+
+/**
+ * Nearest-airport fallback for a place nobody has an airport for.
+ *
+ * 1. A built-in list of towns people actually type (Brescia, Budva, Marmaris,
+ *    Diani...) mapped to the airports that serve them.
+ * 2. Failing that, geocode the text with OpenStreetMap's Nominatim and pick
+ *    the three nearest airports in the directory by distance.
+ * Either way the dropdown shows a real IATA code with a "nearest airport to X"
+ * line, instead of "no results".
+ */
+async function nearestFor(query: string): Promise<Place[]> {
+  const aliased = aliasAirports(query);
+  if (aliased.length > 0) {
+    return aliased.map(({ airport, placeName }) =>
+      fromEntry(airport, `Nearest airport to ${placeName}`),
+    );
+  }
+  try {
+    const url = new URL('https://nominatim.openstreetmap.org/search');
+    url.searchParams.set('q', query);
+    url.searchParams.set('format', 'json');
+    url.searchParams.set('limit', '1');
+    url.searchParams.set('accept-language', 'en');
+    const res = await fetch(url.toString(), {
+      headers: { 'User-Agent': 'eZAY Travels (ezaytravels.co.uk) nearest-airport lookup' },
+      next: { revalidate: 86400 },
+    });
+    if (!res.ok) return [];
+    const hits = (await res.json()) as Array<{ lat: string; lon: string; display_name?: string }>;
+    const hit = hits[0];
+    if (!hit) return [];
+    const lat = Number(hit.lat);
+    const lon = Number(hit.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return [];
+    const placeName = (hit.display_name ?? query).split(',')[0].trim() || query;
+    return nearestAirports(lat, lon, 3).map(({ airport, km }) =>
+      fromEntry(airport, `Nearest airport to ${placeName} (${km} km)`),
+    );
+  } catch (error) {
+    console.error('nearest-airport geocode error:', error);
+    return [];
+  }
 }
 
 export async function GET(request: Request) {
@@ -36,10 +82,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ places: [] });
   }
 
-  const local = searchAirports(query).map(fromEntry);
+  const local = searchAirports(query).map((a) => fromEntry(a));
 
   if (config.duffel.demoMode) {
-    return NextResponse.json({ places: local });
+    return NextResponse.json({ places: local.length > 0 ? local : await nearestFor(query) });
   }
 
   try {
@@ -57,7 +103,7 @@ export async function GET(request: Request) {
 
     if (!res.ok) {
       // Duffel unhappy — the local directory still gives a useful dropdown.
-      return NextResponse.json({ places: local });
+      return NextResponse.json({ places: local.length > 0 ? local : await nearestFor(query) });
     }
 
     const data = await res.json();
@@ -91,9 +137,12 @@ export async function GET(request: Request) {
       return true;
     });
 
+    if (merged.length === 0) {
+      return NextResponse.json({ places: await nearestFor(query) });
+    }
     return NextResponse.json({ places: merged.slice(0, 8) });
   } catch (error) {
     console.error('places route error:', error);
-    return NextResponse.json({ places: local });
+    return NextResponse.json({ places: local.length > 0 ? local : await nearestFor(query) });
   }
 }

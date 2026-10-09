@@ -26,6 +26,7 @@ export interface PlaceSuggestion {
   city: string | null;
   country: string | null;
   metro: boolean;
+  note?: string;
 }
 
 export function AirportField({
@@ -77,6 +78,19 @@ export function AirportField({
     timer.current = setTimeout(() => fetchSuggestions(text), 250);
   }
 
+  /** Click or tab into the field: select what is there so typing replaces it. */
+  function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
+    e.target.select();
+    if (suggestions.length > 0) setOpen(true);
+  }
+
+  function clear() {
+    onChange({ text: '', code: null });
+    setSuggestions([]);
+    setOpen(false);
+    (inputRef as React.RefObject<HTMLInputElement> | undefined)?.current?.focus();
+  }
+
   function pick(place: PlaceSuggestion) {
     onChange({ text: `${place.name} (${place.code})`, code: place.code });
     setOpen(false);
@@ -118,13 +132,42 @@ export function AirportField({
         value={value.text}
         onChange={handleInput}
         onKeyDown={handleKeyDown}
-        onFocus={() => suggestions.length > 0 && setOpen(true)}
+        onFocus={handleFocus}
+        onMouseUp={(e) => {
+          // Keep the whole text selected on the first click (browsers deselect on mouseup).
+          const el = e.currentTarget;
+          if (el.selectionStart === el.selectionEnd) el.select();
+        }}
         autoComplete="off"
         role="combobox"
         aria-expanded={open}
         aria-autocomplete="list"
         aria-controls={`${id}-listbox`}
       />
+      {value.text.length > 0 && (
+        <button
+          type="button"
+          aria-label={`Clear ${label}`}
+          onClick={clear}
+          style={{
+            position: 'absolute',
+            right: 10,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            border: 0,
+            background: 'rgba(0,0,0,0.08)',
+            borderRadius: '50%',
+            width: 22,
+            height: 22,
+            lineHeight: '22px',
+            fontSize: 14,
+            cursor: 'pointer',
+            color: 'inherit',
+          }}
+        >
+          ×
+        </button>
+      )}
       {open && (
         <ul
           id={`${id}-listbox`}
@@ -167,9 +210,11 @@ export function AirportField({
                 {place.name} <span style={{ opacity: 0.65 }}>({place.code})</span>
               </div>
               <div style={{ fontSize: 12, opacity: 0.65 }}>
-                {place.metro
-                  ? 'All airports'
-                  : [place.city, place.country].filter(Boolean).join(' · ') || 'Airport'}
+                {place.note
+                  ? place.note
+                  : place.metro
+                    ? 'All airports'
+                    : [place.city, place.country].filter(Boolean).join(' · ') || 'Airport'}
               </div>
             </li>
           ))}

@@ -28,8 +28,6 @@ export function SiteFooter() {
           <div>
             <a href={`mailto:${company.email}`}>{company.email}</a>
             <br />
-            <a href={`tel:${company.phone.replace(/\s+/g, '')}`}>{company.phone}</a>
-            <br />
             <a
               href={`https://wa.me/${company.whatsapp}?text=${encodeURIComponent('Hi eZAY — ')}`}
               target="_blank"

@@ -65,9 +65,9 @@ export const company = {
   address: '181 Barcombe Avenue, London SW2 3BH',
   director: 'Zainab Ahmed Husein (known as Zay)',
   email: clean('COMPANY_EMAIL') || 'manager@ezaytravels.co.uk',
-  phone: clean('COMPANY_PHONE') || '+44 7849 549740',
+  phone: clean('COMPANY_PHONE') || '+44 7849 549140',
   /** Digits only, international format, for wa.me links. */
-  whatsapp: clean('WHATSAPP_NUMBER') || '447849549740',
+  whatsapp: clean('WHATSAPP_NUMBER') || '447849549140',
   website: 'ezaytravels.co.uk',
   insurance:
     'Professional indemnity and public liability insurance arranged through Campbell Irvine (Insurance Brokers) Ltd, in force from 7 October 2026.',
