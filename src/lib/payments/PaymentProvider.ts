@@ -85,6 +85,15 @@ export type AuthorizationState =
   /** Cancelled, failed, or unknown to the provider. */
   | 'dead';
 
+/** Whether the wallets are actually live on our own domain. */
+export interface WalletStatus {
+  domainName: string;
+  registered: boolean;
+  applePay: boolean;
+  googlePay: boolean;
+  link: boolean;
+}
+
 export interface PaymentProvider {
   readonly name: string;
 
@@ -120,6 +129,16 @@ export interface PaymentProvider {
   handleWebhook(rawBody: string | Buffer, signature: string | null): Promise<PaymentEvent | null>;
 
   refund(paymentRef: string, amountMinor: number, reason?: string): Promise<RefundResult>;
+
+  /**
+   * Reports whether our domain is registered for wallet payments and which
+   * wallets are live on it. Null when payments are not configured at all.
+   * Exists so the owner can verify Apple Pay and Google Pay from /status
+   * rather than guessing from whichever browser happens to be to hand —
+   * a desktop that shows no wallet button looks identical to a broken
+   * configuration, and that ambiguity has cost real time.
+   */
+  walletStatus(): Promise<WalletStatus | null>;
 
   getStatus(paymentRef: string): Promise<PaymentStatus>;
 }
