@@ -48,7 +48,6 @@ export default async function HomePage() {
       postalCode: 'SW2 3BH',
       addressCountry: 'GB',
     },
-    telephone: config.contact.phone,
     email: config.contact.email,
     founder: { '@type': 'Person', name: 'Zainab Ahmed Husein' },
     knowsLanguage: ['en', 'so', 'sw', 'ar', 'it'],
@@ -78,7 +77,7 @@ export default async function HomePage() {
         <DestinationBands bands={bands} />
       </FareSelectionProvider>
 
-      <EnquiryPanel whatsappNumber={config.contact.whatsapp} phone={config.contact.phone} />
+      <EnquiryPanel whatsappNumber={config.contact.whatsapp} />
 
       <CredentialsSection />
 
@@ -86,7 +85,6 @@ export default async function HomePage() {
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}
-        phone={config.contact.phone}
         email={config.contact.email}
       />
     </>

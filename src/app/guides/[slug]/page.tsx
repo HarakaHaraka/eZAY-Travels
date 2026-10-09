@@ -178,7 +178,6 @@ export default async function GuidePage({ params }: { params: { slug: string } }
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}
-        phone={config.contact.phone}
         email={config.contact.email}
       />
     </>

@@ -12,11 +12,9 @@ import { BUDGET_BANDS } from '@/lib/enquiryOptions';
  */
 export function EnquiryPanel({
   whatsappNumber,
-  phone,
   prefillTrip = '',
 }: {
   whatsappNumber: string;
-  phone: string;
   prefillTrip?: string;
 }) {
   const [budget, setBudget] = useState<string>('');
@@ -71,7 +69,7 @@ export function EnquiryPanel({
           plainly if you&rsquo;re better off booking it yourself.
         </p>
         <a className="btn wa" href={waHref} target="_blank" rel="noopener">
-          WhatsApp {phone}
+          WhatsApp us
         </a>
         <p style={{ fontSize: 13, color: 'var(--color-neutral-400)', marginTop: 12 }}>
           Usually replies within the hour

@@ -304,7 +304,6 @@ export default function FaqPage() {
       <SiteFooter />
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}
-        phone={config.contact.phone}
         email={config.contact.email}
       />
     </>
