@@ -37,7 +37,7 @@ export function BookingFlow({
   insurance: { description: string; sellMinor: number };
 }) {
   const [passengers, setPassengers] = useState(
-    Array.from({ length: passengerCount }, () => ({ givenName: '', familyName: '' }))
+    Array.from({ length: passengerCount }, () => ({ givenName: '', familyName: '', bornOn: '' }))
   );
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -58,7 +58,11 @@ export function BookingFlow({
     return total;
   }, [flightTotalMinor, selectedStay, wantsInsurance, insurance.sellMinor]);
 
-  function updatePassenger(index: number, field: 'givenName' | 'familyName', value: string) {
+  function updatePassenger(
+    index: number,
+    field: 'givenName' | 'familyName' | 'bornOn',
+    value: string
+  ) {
     setPassengers((current) => current.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
   }
 
@@ -137,6 +141,10 @@ export function BookingFlow({
           <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
             Names must match the passport exactly — airlines charge to change them.
           </p>
+          <p style={{ fontSize: 13.5, color: 'var(--color-neutral-800)', margin: '6px 0 0' }}>
+            Give every name exactly as printed in the passport you will travel on. Airlines refuse
+            boarding for a mismatch, and corrections cost money once the ticket is issued.
+          </p>
           <div style={{ display: 'grid', gap: 14, marginTop: 8 }}>
             {passengers.map((passenger, index) => (
               <div key={index} style={{ display: 'grid', gap: 10, gridTemplateColumns: '1fr 1fr' }}>
@@ -161,6 +169,22 @@ export function BookingFlow({
                     value={passenger.familyName}
                     onChange={(e) => updatePassenger(index, 'familyName', e.target.value)}
                   />
+                </div>
+                <div className="field" style={{ gridColumn: '1 / -1' }}>
+                  <label htmlFor={`born-${index}`}>Date of birth</label>
+                  <input
+                    id={`born-${index}`}
+                    className="input"
+                    type="date"
+                    required
+                    max={new Date().toISOString().slice(0, 10)}
+                    value={passenger.bornOn}
+                    onChange={(e) => updatePassenger(index, 'bornOn', e.target.value)}
+                  />
+                  <span style={{ fontSize: 12, color: 'var(--color-neutral-700)' }}>
+                    Exactly as it appears in the passport. The airline will not issue a ticket
+                    without it.
+                  </span>
                 </div>
               </div>
             ))}
