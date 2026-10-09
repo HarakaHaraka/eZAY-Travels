@@ -1,0 +1,39 @@
+# Trigger a Render deploy whenever main changes.
+#
+# Render's own auto-deploy has not been firing for this service, which left the
+# live site running old code while main moved ahead. This runs on GitHub's
+# machines and calls the service's Deploy Hook, so a merge to main always
+# reaches production.
+#
+# Setup: add a repository secret named RENDER_DEPLOY_HOOK_URL containing the
+# Deploy Hook URL from Render (service -> Settings -> Deploy Hook). The URL is
+# a secret but single-purpose: it can only start a deploy. It is never written
+# into the repository.
+#
+# It can also be run on demand from the Actions tab ("Run workflow").
+name: Deploy to Render
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call the Render deploy hook
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK_URL secret is not set, so nothing was deployed."
+            exit 1
+          fi
+          code=$(curl -sS -o response.txt -w '%{http_code}' "$HOOK")
+          echo "Render responded with HTTP $code"
+          cat response.txt
+          case "$code" in
+            2*) echo "Deploy triggered." ;;
+            *)  echo "::error::Render refused the deploy hook (HTTP $code)."; exit 1 ;;
+          esac

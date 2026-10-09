@@ -191,7 +191,6 @@ export default async function FaresPage({
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}
-        phone={config.contact.phone}
         email={config.contact.email}
       />
     </>

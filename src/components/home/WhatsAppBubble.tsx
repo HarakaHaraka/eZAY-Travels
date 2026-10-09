@@ -13,11 +13,9 @@ const QUICK_REPLIES: Array<[label: string, opener: string]> = [
 
 export function WhatsAppBubble({
   whatsappNumber,
-  phone,
   email,
 }: {
   whatsappNumber: string;
-  phone: string;
   email: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -62,7 +60,6 @@ export function WhatsAppBubble({
             ))}
           </div>
           <div className="waalt">
-            <a href={`tel:${phone}`}>Call instead</a>
             <a href={`mailto:${email}`}>Email instead</a>
           </div>
         </div>

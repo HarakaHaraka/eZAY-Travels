@@ -106,7 +106,6 @@ export default async function GuidesIndex() {
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}
-        phone={config.contact.phone}
         email={config.contact.email}
       />
     </>

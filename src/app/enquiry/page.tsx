@@ -63,7 +63,6 @@ export default function EnquiryPage({
 
       <EnquiryPanel
         whatsappNumber={config.contact.whatsapp}
-        phone={config.contact.phone}
         prefillTrip={prefill}
       />
 
@@ -71,7 +70,6 @@ export default function EnquiryPage({
 
       <WhatsAppBubble
         whatsappNumber={config.contact.whatsapp}
-        phone={config.contact.phone}
         email={config.contact.email}
       />
     </>
