@@ -12,7 +12,12 @@ import {
  * The blank-config guard, which is the one test that keeps the business legal.
  *
  * eZAY ships with ATOL_HOLDER_NAME and ATOL_NUMBER blank and must, in that
- * state, make no protection claim anywhere and take no flight booking.
+ * state, make NO PROTECTION CLAIM ANYWHERE. That part is absolute.
+ *
+ * What it may still do, since 9 October 2026, is sell flight-only tickets:
+ * they are issued instantly and sold as disclosed agent for the airline, which
+ * is outside the ATOL scheme. Flight-inclusive PACKAGES remain blocked,
+ * because those genuinely do require an ATOL.
  */
 
 const ORIGINAL = { ...process.env };
@@ -33,15 +38,27 @@ describe('blank config — the shipped default', () => {
     expect(accreditationClaim()).toBeNull();
   });
 
-  it('disables flight checkout', () => {
+  it('still allows flight-only checkout — an airline ticket is not an ATOL product', () => {
+    expect(canSellFlights()).toBe(true);
+  });
+
+  it('makes no protection claim while allowing that checkout', () => {
+    expect(canSellFlights()).toBe(true);
+    expect(accreditationClaim()).toBeNull();
+  });
+
+  it('blocks flight-only checkout the moment agent mode is switched off', () => {
+    process.env.FLIGHT_ONLY_AGENT_MODE = 'false';
     expect(canSellFlights()).toBe(false);
+    expect(flightCheckoutBlockedReason()).not.toBeNull();
   });
 
   it('disables packages', () => {
     expect(canSellPackages()).toBe(false);
   });
 
-  it('presents the enquiry form as the path forward', () => {
+  it('presents the enquiry form as the path forward when checkout is off', () => {
+    process.env.FLIGHT_ONLY_AGENT_MODE = 'false';
     const reason = flightCheckoutBlockedReason();
     expect(reason).not.toBeNull();
     expect(reason).toMatch(/quote|dates/i);
@@ -66,21 +83,18 @@ describe('partially populated config is still blank', () => {
     process.env.ATOL_HOLDER_NAME = 'Partner Travel Ltd';
     process.env.ATOL_NUMBER = '';
     expect(accreditationClaim()).toBeNull();
-    expect(canSellFlights()).toBe(false);
   });
 
   it('number without a holder name claims nothing', () => {
     process.env.ATOL_HOLDER_NAME = '';
     process.env.ATOL_NUMBER = '11223';
     expect(accreditationClaim()).toBeNull();
-    expect(canSellFlights()).toBe(false);
   });
 
   it('whitespace does not count as populated', () => {
     process.env.ATOL_HOLDER_NAME = '   ';
     process.env.ATOL_NUMBER = '  ';
     expect(accreditationClaim()).toBeNull();
-    expect(canSellFlights()).toBe(false);
   });
 });
 
@@ -106,6 +120,7 @@ describe('populated config', () => {
   });
 
   it('still refuses flights when the scope excludes them', () => {
+    process.env.FLIGHT_ONLY_AGENT_MODE = 'false';
     process.env.ATOL_SCOPE = 'package';
     expect(canSellFlights()).toBe(false);
     expect(canSellPackages()).toBe(true);
@@ -113,6 +128,7 @@ describe('populated config', () => {
   });
 
   it('refuses everything when the scope is empty', () => {
+    process.env.FLIGHT_ONLY_AGENT_MODE = 'false';
     process.env.ATOL_SCOPE = '';
     expect(canSellFlights()).toBe(false);
     expect(canSellPackages()).toBe(false);
@@ -127,15 +143,24 @@ describe('populated config', () => {
   });
 });
 
-describe('flight-only agent mode — the explicit opt-in', () => {
-  it('stays off unless FLIGHT_ONLY_AGENT_MODE is exactly true', () => {
+describe('flight-only agent mode — on by default, switchable off', () => {
+  it('is on when the variable is unset, so a bare deployment can trade', () => {
     process.env.FLIGHT_ONLY_AGENT_MODE = '';
-    expect(canSellFlights()).toBe(false);
-    process.env.FLIGHT_ONLY_AGENT_MODE = 'yes';
-    expect(canSellFlights()).toBe(false);
+    expect(canSellFlights()).toBe(true);
   });
 
-  it('enables flight-only checkout with no protection claim and packages still off', () => {
+  it('goes off for false, 0 and off, and nothing else', () => {
+    for (const value of ['false', 'FALSE', '0', 'off']) {
+      process.env.FLIGHT_ONLY_AGENT_MODE = value;
+      expect(canSellFlights(), `${value} should disable checkout`).toBe(false);
+    }
+    for (const value of ['true', 'yes', 'on']) {
+      process.env.FLIGHT_ONLY_AGENT_MODE = value;
+      expect(canSellFlights(), `${value} should allow checkout`).toBe(true);
+    }
+  });
+
+  it('never unlocks packages, whatever it is set to', () => {
     process.env.FLIGHT_ONLY_AGENT_MODE = 'true';
     expect(canSellFlights()).toBe(true);
     expect(accreditationClaim()).toBeNull();

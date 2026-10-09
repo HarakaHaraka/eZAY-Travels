@@ -41,8 +41,8 @@ export default function EnquiryPage({
           Tell us the trip. We&rsquo;ll come back with a real number.
         </h1>
         <p style={{ maxWidth: '56ch', fontSize: 17, color: 'var(--color-neutral-800)' }}>
-          We check the live search, the trade net fares and our ticketing partner before we quote —
-          then tell you which one we used and what we made on it.
+          We check the live search and our trade fares before we quote, so the number you get back
+          is the real one, for your dates.
         </p>
 
         {blocked && (

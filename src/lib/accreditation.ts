@@ -63,12 +63,19 @@ export function accreditationClaim(): AccreditationClaim | null {
  * disclosed agent for the airline, is outside the ATOL scheme (it is an
  * airline ticket sale, not a flight accommodation arrangement). eZAY issues
  * tickets instantly through Duffel, so this mode lets checkout run with NO
- * protection claim rendered anywhere. It is off by default and switched on
- * only by setting FLIGHT_ONLY_AGENT_MODE=true in the environment, in writing.
- * Packages stay blocked until a real ATOL claim is configured.
+ * protection claim rendered anywhere.
+ *
+ * It defaults ON, by the owner's written instruction of 9 October 2026 (see
+ * CLAUDE.md rule 4). Set FLIGHT_ONLY_AGENT_MODE=false to take flight checkout
+ * down again. PACKAGES STAY BLOCKED until a real ATOL claim is configured —
+ * that guard is untouched, because a flight-inclusive package genuinely does
+ * need an ATOL.
  */
 export function flightOnlyAgentMode(): boolean {
-  return clean('FLIGHT_ONLY_AGENT_MODE').toLowerCase() === 'true';
+  const raw = clean('FLIGHT_ONLY_AGENT_MODE').toLowerCase();
+  // Defaults ON. Set the variable to "false" to take flight checkout down.
+  if (raw === '') return true;
+  return raw !== 'false' && raw !== '0' && raw !== 'off';
 }
 
 /** A flight-only sale needs a complete claim that covers flight_only, or agent mode. */
