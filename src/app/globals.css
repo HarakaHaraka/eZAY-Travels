@@ -21,3 +21,9 @@
 .paystep-note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--color-neutral-800, #4a5568); }
 .paystep-error { margin: 0; font-size: 14px; color: #b42318; font-weight: 600; }
 .paystep-fine { margin: 0; font-size: 12px; color: var(--color-neutral-700, #6b7280); }
+.paystep-handoff { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 14px 16px; border-radius: 16px; background: var(--color-surface, #f4f6f9); }
+.paystep-handoff img { border-radius: 10px; flex: none; }
+.paystep-handoff > div { flex: 1 1 220px; min-width: 0; }
+.paystep-handoff strong { display: block; font-size: 14.5px; margin-bottom: 4px; }
+.paystep-handoff p { margin: 0 0 6px; font-size: 13px; line-height: 1.45; color: var(--color-neutral-800, #4a5568); }
+.paystep-handoff a { font-size: 13px; color: var(--color-accent-700); }

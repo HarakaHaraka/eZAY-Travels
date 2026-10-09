@@ -99,6 +99,13 @@ export interface PaymentProvider {
   /** What the provider currently thinks of this authorisation. */
   authorizationState(paymentRef: string): Promise<AuthorizationState>;
 
+  /**
+   * The client secret for an authorisation already created, so the same
+   * payment can be completed on another device (the "finish on your phone"
+   * link). Null when the payment can no longer be completed.
+   */
+  resumeAuthorization(paymentRef: string): Promise<PaymentAuthorization | null>;
+
   /** Takes the money. Only ever called after the ticket is issued. */
   capture(paymentRef: string): Promise<void>;
 

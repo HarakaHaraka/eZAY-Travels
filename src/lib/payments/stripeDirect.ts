@@ -113,6 +113,25 @@ export class StripeDirectProvider implements PaymentProvider {
     }
   }
 
+  async resumeAuthorization(paymentRef: string): Promise<PaymentAuthorization | null> {
+    if (config.payments.demoMode) {
+      return { paymentRef, clientSecret: `${paymentRef}_secret_demo`, publishableKey: '' };
+    }
+    const intent = await stripeClient().paymentIntents.retrieve(paymentRef);
+    // Only a payment still awaiting the customer can be resumed. One already
+    // captured, or cancelled, must not reopen a payment screen.
+    const resumable =
+      intent.status === 'requires_payment_method' ||
+      intent.status === 'requires_confirmation' ||
+      intent.status === 'requires_action';
+    if (!resumable || intent.client_secret === null) return null;
+    return {
+      paymentRef: intent.id,
+      clientSecret: intent.client_secret,
+      publishableKey: config.payments.stripePublishableKey,
+    };
+  }
+
   async capture(paymentRef: string): Promise<void> {
     if (config.payments.demoMode) return;
     await stripeClient().paymentIntents.capture(paymentRef);

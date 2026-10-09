@@ -8,7 +8,8 @@ import {
   useStripe,
 } from '@stripe/react-stripe-js';
 import { loadStripe, type Stripe } from '@stripe/stripe-js';
-import { useMemo, useState } from 'react';
+import QRCode from 'qrcode';
+import { useEffect, useMemo, useState } from 'react';
 import { formatMoney } from '@/lib/money';
 
 /**
@@ -47,6 +48,8 @@ export interface Authorization {
   offerId: string;
   clientSecret: string;
   publishableKey: string;
+  /** Signed link to finish this same booking on another device. */
+  payUrl?: string;
 }
 
 export function PaymentStep({
@@ -94,6 +97,26 @@ function PayForm({
   const [error, setError] = useState<string | null>(null);
   const [stage, setStage] = useState<Stage>('idle');
   const [hasWallets, setHasWallets] = useState(false);
+  /** Set once the express element has reported, so the hand-off only shows
+   *  when we KNOW there is no wallet here, not merely before it has loaded. */
+  const [walletsChecked, setWalletsChecked] = useState(false);
+  const [qr, setQr] = useState<string | null>(null);
+
+  // Draw the hand-off QR only when this device has no wallet of its own.
+  useEffect(() => {
+    if (!walletsChecked || hasWallets || !auth.payUrl) return;
+    let live = true;
+    QRCode.toDataURL(auth.payUrl, { margin: 1, width: 180 })
+      .then((url) => {
+        if (live) setQr(url);
+      })
+      .catch(() => {
+        /* no QR is fine; the link below it still works */
+      });
+    return () => {
+      live = false;
+    };
+  }, [walletsChecked, hasWallets, auth.payUrl]);
 
   function fail(message: string) {
     setBusy(false);
@@ -174,6 +197,7 @@ function PayForm({
           options={{ buttonTheme: { applePay: 'black', googlePay: 'black' }, buttonHeight: 48 }}
           onReady={({ availablePaymentMethods }) => {
             setHasWallets(Boolean(availablePaymentMethods));
+            setWalletsChecked(true);
           }}
           onConfirm={() => {
             if (!busy) void authoriseThenBook();
@@ -185,6 +209,23 @@ function PayForm({
           </div>
         )}
       </div>
+
+      {walletsChecked && !hasWallets && auth.payUrl && (
+        <div className="paystep-handoff">
+          {/* A client-generated data: URL. next/image cannot optimise one and
+              would only add a round trip, so a plain img is correct here. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {qr && <img src={qr} alt="" width={120} height={120} />}
+          <div>
+            <strong>Prefer Apple Pay or Google Pay?</strong>
+            <p>
+              This browser has no wallet set up. Scan the code with your phone to finish the same
+              booking there in one tap — nothing is charged twice, it is the same payment.
+            </p>
+            <a href={auth.payUrl}>Or open the link on this device</a>
+          </div>
+        </div>
+      )}
 
       <PaymentElement options={{ layout: 'tabs' }} />
 
